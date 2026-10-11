@@ -1,0 +1,2844 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SF.Track Pro</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --navy-950:#0a0e17; --navy-900:#0d1424; --navy-800:#121b30; --navy-700:#1a2540; --navy-600:#243252;
+  --border:#26324a; --border-soft:#1c2740;
+  --yellow:#f4c430; --yellow-dim:#c9a323;
+  --white:#eef1f6; --muted:#8b96ac; --muted-dim:#5d6883;
+  --green:#2ecc71; --orange:#ff9f43; --red:#ff5555; --blue:#4fa3ff;
+  --radius:10px;
+  --on-accent:#0a0e17; /* text on yellow accent surfaces — stays dark in both themes */
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root[data-theme="light"]{
+  --navy-950:#f3f5f9; --navy-900:#ffffff; --navy-800:#ffffff; --navy-700:#eef1f6; --navy-600:#e3e7ee;
+  --border:#dde3ec; --border-soft:#e9edf3;
+  --white:#101828; --muted:#57607a; --muted-dim:#8892a8;
+}
+:root[data-theme="light"] .topbar{background:rgba(255,255,255,.92);}
+*{box-sizing:inherit; margin:0; padding:0;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+html,body{height:100%; background:var(--navy-950); color:var(--white); font-family:var(--font); overflow-x:hidden;}
+body{-webkit-font-smoothing:antialiased; font-size:14px;}
+::-webkit-scrollbar{width:8px; height:8px;}
+::-webkit-scrollbar-thumb{background:var(--navy-600); border-radius:8px;}
+button, input, select{font-family:inherit; font-size:inherit; color:inherit;}
+button{cursor:pointer;}
+a{color:inherit; text-decoration:none;}
+
+/* ---------- LOGIN ---------- */
+#loginScreen{min-height:100vh; min-height:100dvh; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; padding:20px;}
+#loginScreen::before{content:''; position:absolute; inset:0; background:
+  radial-gradient(circle at 15% 20%, rgba(244,196,48,.08), transparent 40%),
+  radial-gradient(circle at 85% 80%, rgba(79,163,255,.08), transparent 40%),
+  linear-gradient(160deg, var(--navy-950), var(--navy-700));
+  z-index:0;}
+#loginScreen::after{content:''; position:absolute; inset:0; z-index:0; opacity:.5;
+  background-image: linear-gradient(var(--border-soft) 1px, transparent 1px), linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
+  background-size:42px 42px; mask-image:radial-gradient(circle at 50% 30%, black, transparent 70%);}
+.login-card{position:relative; z-index:1; width:100%; max-width:400px; background:linear-gradient(180deg, var(--navy-800), var(--navy-900)); border:1px solid var(--border); border-radius:16px; padding:36px 32px; box-shadow:0 30px 60px rgba(0,0,0,.5);}
+.login-brand{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+.brand-mark{width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg, var(--yellow), var(--yellow-dim)); display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--on-accent); font-weight:800; flex-shrink:0;}
+.brand-name{font-weight:800; font-size:19px; letter-spacing:.3px;}
+.brand-sub{color:var(--muted); font-size:12px; margin-top:2px;}
+.login-title{margin-top:26px; font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); font-weight:600;}
+.field{margin-top:16px;}
+.field label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:600;}
+.field .input-wrap{position:relative;}
+.field input, .field select{width:100%; padding:11px 14px 11px 38px; background:var(--navy-950); border:1px solid var(--border); border-radius:8px; outline:none; transition:border .15s;}
+.field input:focus, .field select:focus{border-color:var(--yellow);}
+.field .field-icon{pointer-events:none; position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted-dim); font-size:13px;}
+.btn{border:none; border-radius:8px; padding:11px 18px; font-weight:700; font-size:13.5px; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:filter .15s, transform .1s;}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:linear-gradient(135deg, var(--yellow), var(--yellow-dim)); color:var(--on-accent);}
+.btn-primary:hover{filter:brightness(1.08);}
+.btn-block{width:100%;}
+.btn-ghost{background:var(--navy-700); color:var(--white); border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--navy-600);}
+.login-submit{margin-top:22px;}
+.demo-accounts{margin-top:22px; padding-top:18px; border-top:1px dashed var(--border);}
+.demo-accounts p{font-size:11.5px; color:var(--muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:.6px; font-weight:600;}
+.demo-btns{display:flex; gap:8px;}
+.demo-btns button{flex:1; padding:9px; font-size:12px;}
+.login-error{margin-top:14px; background:rgba(255,85,85,.12); border:1px solid rgba(255,85,85,.35); color:#ff8888; padding:9px 12px; border-radius:8px; font-size:12.5px; display:none;}
+
+/* ---------- APP SHELL ---------- */
+#app{display:none; min-height:100vh; min-height:100dvh;}
+.shell{display:flex; min-height:100vh; min-height:100dvh;}
+
+.sidebar{width:250px; flex-shrink:0; background:var(--navy-900); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; top:0; bottom:0; left:0; z-index:40; transition:transform .2s ease;}
+.sidebar-head{padding:18px 18px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border-soft);}
+.sidebar-head .brand-mark{width:36px; height:36px; font-size:16px;}
+.sidebar-head .brand-name{font-size:15.5px;}
+.sidebar-head .brand-sub{font-size:10.5px;}
+.nav-scroll{flex:1; overflow-y:auto; padding:14px 12px;}
+.nav-section-label{font-size:10.5px; text-transform:uppercase; letter-spacing:.8px; color:var(--muted-dim); font-weight:700; padding:12px 10px 6px;}
+.nav-item{display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:8px; color:var(--muted); font-weight:600; font-size:13.5px; margin-bottom:2px; position:relative;}
+.nav-item .nav-ic{width:16px; text-align:center; font-size:14px;}
+.nav-item:hover{background:var(--navy-800); color:var(--white);}
+.nav-item.active{background:var(--navy-800); color:var(--yellow);}
+.nav-item.active::before{content:''; position:absolute; left:-12px; top:8px; bottom:8px; width:3px; background:var(--yellow); border-radius:0 3px 3px 0;}
+.nav-item .soon-tag{margin-left:auto; font-size:9px; background:var(--navy-600); color:var(--muted); padding:2px 6px; border-radius:20px; font-weight:700; letter-spacing:.3px;}
+.sidebar-foot{padding:14px 18px; border-top:1px solid var(--border-soft); font-size:11px; color:var(--muted-dim);}
+
+.main{flex:1; margin-left:250px; display:flex; flex-direction:column; min-width:0;}
+.topbar{min-height:64px; flex-shrink:0; background:rgba(13,20,36,.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:14px; padding:6px 20px; position:sticky; top:0; z-index:30; flex-wrap:wrap;}
+.hamburger{display:flex; align-items:center; justify-content:center; width:38px; height:38px; flex-shrink:0; background:var(--navy-800); border:1px solid var(--border); border-radius:8px; color:var(--muted); font-size:15px; padding:0;}
+.hamburger:hover{color:var(--white); background:var(--navy-700);}
+.theme-ic-light{display:none;}
+:root[data-theme="light"] .theme-ic-dark{display:none;}
+:root[data-theme="light"] .theme-ic-light{display:inline-block;}
+.main{transition:margin-left .2s ease;}
+@media (min-width:769px){
+  #app.sidebar-collapsed .sidebar{transform:translateX(-100%);}
+  #app.sidebar-collapsed .main{margin-left:0;}
+}
+.loc-select-wrap{position:relative;}
+.loc-select{background:var(--navy-800); border:1px solid var(--border); padding:8px 34px 8px 34px; border-radius:8px; font-weight:600; font-size:13px; appearance:none; min-width:170px;}
+.loc-select-wrap .loc-ic{position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--yellow); font-size:12px; pointer-events:none;}
+.loc-select-wrap .chev{position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:11px; pointer-events:none;}
+.search-wrap{flex:1; max-width:380px; position:relative; display:flex; align-items:center;}
+.search-wrap input{width:100%; background:var(--navy-800); border:1px solid var(--border); border-radius:8px; padding:8px 12px 8px 34px;}
+.search-wrap > i, .search-wrap > svg{pointer-events:none; position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted-dim); font-size:12px;}
+.topbar-right{margin-left:auto; display:flex; align-items:center; gap:10px;}
+.icon-btn{position:relative; width:38px; height:38px; border-radius:8px; background:var(--navy-800); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--muted);}
+.icon-btn:hover{color:var(--white); background:var(--navy-700);}
+.badge-dot{position:absolute; top:-3px; right:-3px; background:var(--red); color:#fff; font-size:9.5px; font-weight:800; min-width:16px; height:16px; border-radius:20px; display:flex; align-items:center; justify-content:center; padding:0 4px; border:2px solid var(--navy-900);}
+.profile-wrap{position:relative; display:flex; align-items:center; gap:9px; padding:5px 10px 5px 6px; border-radius:8px; background:var(--navy-800); border:1px solid var(--border);}
+.avatar{width:28px; height:28px; border-radius:7px; background:linear-gradient(135deg,var(--yellow),var(--yellow-dim)); color:var(--on-accent); font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.profile-meta{display:flex; flex-direction:column; line-height:1.2;}
+.profile-name{font-size:12.5px; font-weight:700;}
+.profile-role{font-size:10.5px; color:var(--muted);}
+.dropdown-panel{position:absolute; top:calc(100% + 8px); right:0; background:var(--navy-800); border:1px solid var(--border); border-radius:10px; width:230px; box-shadow:0 20px 40px rgba(0,0,0,.5); display:none; overflow:hidden; z-index:50;}
+.dropdown-panel.open{display:block;}
+.dropdown-panel .dp-head{padding:12px 14px; border-bottom:1px solid var(--border-soft); font-size:12px; color:var(--muted);}
+.dropdown-item{padding:11px 14px; font-size:13px; display:flex; align-items:center; gap:9px; color:var(--white); font-weight:500;}
+.dropdown-item:hover{background:var(--navy-700);}
+.dropdown-item i, .dropdown-item svg{width:14px; color:var(--muted);}
+.dropdown-item.danger{color:#ff8888;}
+.notif-panel{width:320px; max-height:380px; overflow-y:auto;}
+.notif-item{padding:12px 14px; border-bottom:1px solid var(--border-soft); display:flex; gap:10px;}
+.notif-item i, .notif-item svg{margin-top:2px; font-size:13px;}
+.notif-item .n-text{font-size:12.5px; line-height:1.4;}
+.notif-item .n-time{font-size:10.5px; color:var(--muted-dim); margin-top:3px;}
+
+.content{padding:22px 24px 40px; flex:1;}
+.breadcrumb{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); margin-bottom:4px;}
+.breadcrumb .active{color:var(--white); font-weight:600;}
+.page-head{display:flex; align-items:flex-end; justify-content:space-between; margin:8px 0 22px; flex-wrap:wrap; gap:12px;}
+.page-title{font-size:22px; font-weight:800;}
+.page-sub{color:var(--muted); font-size:13px; margin-top:4px;}
+
+.kpi-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:26px;}
+.kpi-card{background:linear-gradient(180deg,var(--navy-800),var(--navy-900)); border:1px solid var(--border); border-radius:var(--radius); padding:16px 17px; position:relative; overflow:hidden;}
+.kpi-card::before{content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--kc,var(--yellow));}
+.kpi-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+.kpi-label{font-size:11.5px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px;}
+.kpi-icon{width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:13px; background:color-mix(in srgb, var(--kc,var(--yellow)) 18%, transparent); color:var(--kc,var(--yellow));}
+.kpi-value{font-size:26px; font-weight:800;}
+.kpi-foot{font-size:11px; color:var(--muted-dim); margin-top:4px;}
+
+.panel-row{display:grid; grid-template-columns:1.4fr 1fr; gap:16px;}
+.panel{background:var(--navy-800); border:1px solid var(--border); border-radius:var(--radius); padding:18px;}
+.panel h3{font-size:14.5px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px;}
+.func-row{display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--border-soft);}
+.func-row:last-child{border-bottom:none;}
+.func-name{display:flex; align-items:center; gap:10px; font-weight:600; font-size:13px;}
+.func-name i, .func-name svg{color:var(--yellow); width:16px;}
+.func-count{font-size:12px; color:var(--muted); background:var(--navy-700); padding:3px 9px; border-radius:20px; font-weight:700;}
+.status-list .s-row{display:flex; align-items:center; gap:10px; padding:9px 0;}
+.s-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0;}
+.s-row .s-label{flex:1; font-size:12.5px; color:var(--muted);}
+.s-row .s-val{font-weight:800; font-size:13px;}
+
+.locked-page{display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:80px 20px; color:var(--muted);}
+.locked-page i, .locked-page svg{font-size:38px; color:var(--muted-dim); margin-bottom:16px;}
+.locked-page h3{color:var(--white); font-size:17px; margin-bottom:6px;}
+
+.toast-wrap{position:fixed; bottom:20px; right:20px; z-index:200; display:flex; flex-direction:column; gap:8px;}
+.toast{background:var(--navy-800); border:1px solid var(--border); border-left:3px solid var(--yellow); padding:12px 16px; border-radius:8px; font-size:12.5px; box-shadow:0 10px 30px rgba(0,0,0,.4); animation:toastIn .2s ease;}
+@keyframes toastIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+.overlay-scrim{display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:35;}
+
+@media (max-width:900px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .panel-row{grid-template-columns:1fr;}
+  .search-wrap{min-width:140px;}
+}
+@media (max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .overlay-scrim.open{display:block;}
+  .profile-meta{display:none;}
+  .loc-select{min-width:130px; font-size:12px;}
+}
+@media (max-width:480px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .content{padding:16px 14px 30px;}
+  .kpi-value{font-size:21px;}
+}
+
+/* ---------- SF MANAGEMENT ---------- */
+.toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:16px;}
+.toolbar .tb-search{position:relative; flex:1; min-width:180px;}
+.toolbar .tb-search input{width:100%; background:var(--navy-800); border:1px solid var(--border); border-radius:8px; padding:9px 12px 9px 32px;}
+.toolbar .tb-search > i, .toolbar .tb-search > svg{pointer-events:none; position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--muted-dim); font-size:12px;}
+.toolbar select{background:var(--navy-800); border:1px solid var(--border); border-radius:8px; padding:9px 10px; font-weight:600; font-size:12.5px;}
+.sf-table-wrap{background:var(--navy-800); border:1px solid var(--border); border-radius:var(--radius); overflow:auto;}
+table.sf-table{width:100%; border-collapse:collapse; min-width:920px;}
+.sf-table th{text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted-dim); padding:12px 14px; border-bottom:1px solid var(--border); white-space:nowrap; cursor:pointer; user-select:none;}
+.sf-table th:hover{color:var(--yellow);}
+.sf-table td{padding:11px 14px; border-bottom:1px solid var(--border-soft); font-size:12.5px; vertical-align:middle; white-space:nowrap;}
+.sf-table tr:last-child td{border-bottom:none;}
+.sf-table tr:hover td{background:rgba(255,255,255,.02);}
+.pill{display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:800; padding:4px 9px; border-radius:20px; letter-spacing:.3px;}
+.row-actions{display:flex; gap:6px;}
+.icon-sm{width:28px; height:28px; border-radius:6px; background:var(--navy-700); border:1px solid var(--border); display:inline-flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;}
+.icon-sm:hover{color:var(--white); background:var(--navy-600);}
+.empty-state{padding:50px 20px; text-align:center; color:var(--muted);}
+.empty-state i, .empty-state svg{font-size:30px; color:var(--muted-dim); margin-bottom:10px;}
+
+.modal-scrim{display:none; position:fixed; inset:0; background:rgba(5,8,14,.7); z-index:100; align-items:flex-start; justify-content:center; padding:30px 16px; overflow-y:auto;}
+.modal-scrim.open{display:flex;}
+.modal-box{background:var(--navy-900); border:1px solid var(--border); border-radius:14px; width:100%; max-width:620px; box-shadow:0 30px 70px rgba(0,0,0,.6);}
+.modal-head{padding:18px 22px; border-bottom:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between;}
+.modal-head h3{font-size:16px; font-weight:800;}
+.modal-close{background:var(--navy-800); border:1px solid var(--border); width:30px; height:30px; border-radius:7px; color:var(--muted); display:flex; align-items:center; justify-content:center;}
+.modal-body{padding:20px 22px; max-height:70vh; overflow-y:auto;}
+.step-block{margin-bottom:18px; padding-bottom:16px; border-bottom:1px dashed var(--border-soft);}
+.step-block:last-child{border-bottom:none; margin-bottom:0; padding-bottom:0;}
+.step-label{font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--yellow); font-weight:800; margin-bottom:10px;}
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.form-grid .full{grid-column:1/-1;}
+.form-grid label, .field-block label{display:block; font-size:11.5px; color:var(--muted); margin-bottom:5px; font-weight:600;}
+.form-grid input, .form-grid select, .form-grid textarea{width:100%; padding:9px 11px; background:var(--navy-950); border:1px solid var(--border); border-radius:7px; outline:none;}
+.form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus{border-color:var(--yellow);}
+.file-drop{border:1.5px dashed var(--border); border-radius:8px; padding:16px; text-align:center; color:var(--muted); font-size:12px; cursor:pointer;}
+.file-drop:hover{border-color:var(--yellow); color:var(--white);}
+.file-drop i, .file-drop svg{font-size:18px; display:block; margin-bottom:6px; color:var(--muted-dim);}
+.file-chip{display:flex; align-items:center; gap:8px; background:var(--navy-800); border:1px solid var(--border); border-radius:8px; padding:8px 10px; font-size:12px; margin-top:8px;}
+.file-chip i, .file-chip svg{color:var(--yellow);}
+.file-chip .fc-remove{margin-left:auto; color:var(--red); cursor:pointer;}
+.modal-foot{padding:16px 22px; border-top:1px solid var(--border-soft); display:flex; justify-content:flex-end; gap:10px;}
+.view-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px 20px;}
+.view-item .vi-label{font-size:10.5px; text-transform:uppercase; color:var(--muted-dim); font-weight:700; margin-bottom:3px;}
+.view-item .vi-val{font-size:13px; font-weight:600;}
+.view-item.full{grid-column:1/-1;}
+
+@media (max-width:640px){
+  .topbar{padding-left:12px; padding-right:12px; gap:10px;}
+  .search-wrap{order:10; flex:1 1 100%; max-width:none; margin-bottom:4px;}
+  #globalSearchPanel{width:calc(100vw - 24px) !important; max-width:360px;}
+}
+.chart-box{position:relative; width:100%; height:240px; overflow:hidden;}
+.chart-box canvas{max-width:100%;}
+@media (max-width:480px){ .chart-box{height:210px;} }
+.kpi-grid-5{display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:18px;}
+@media (max-width:900px){ .kpi-grid-5{grid-template-columns:repeat(3,1fr);} }
+@media (max-width:480px){ .kpi-grid-5{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="brand-mark">SF</div>
+      <div>
+        <div class="brand-name">SF.Track Pro</div>
+        <div class="brand-sub">Standard Form Monitoring &amp; Compliance</div>
+      </div>
+    </div>
+    <div class="login-title" style="margin-top:24px;">Sign In</div>
+    <form id="loginForm">
+      <div class="field">
+        <label>Username</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-user field-icon"></i>
+          <input type="text" id="loginUser" autocomplete="username" placeholder="Masukkan username" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock field-icon"></i>
+          <input type="password" id="loginPass" autocomplete="current-password" placeholder="Masukkan password" required>
+        </div>
+      </div>
+      <div class="login-error" id="loginError"><i class="fa-solid fa-circle-exclamation"></i> Username atau password salah.</div>
+      <div class="login-submit">
+        <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+      </div>
+    </form>
+    <div class="demo-accounts">
+      <p>Demo Accounts</p>
+      <div class="demo-btns">
+        <button class="btn btn-ghost" onclick="fillDemo('admin')"><i class="fa-solid fa-user-shield"></i> Admin</button>
+        <button class="btn btn-ghost" onclick="fillDemo('supervisor')"><i class="fa-solid fa-user-tie"></i> Supervisor</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="shell">
+    <div class="overlay-scrim" id="scrim"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <div class="brand-mark">SF</div>
+        <div>
+          <div class="brand-name">SF.Track Pro</div>
+          <div class="brand-sub">Enterprise Compliance</div>
+        </div>
+      </div>
+      <div class="nav-scroll">
+        <div class="nav-section-label">Overview</div>
+        <a class="nav-item active" data-page="dashboard" onclick="UIService.navigate('dashboard')"><i class="fa-solid fa-gauge-high nav-ic"></i> Dashboard</a>
+
+        <div class="nav-section-label">Operasional</div>
+        <a class="nav-item" data-page="standardforms" onclick="UIService.navigate('standardforms')"><i class="fa-solid fa-file-signature nav-ic"></i> Standard Forms</a>
+        <a class="nav-item" data-page="schedule" onclick="UIService.navigate('schedule')"><i class="fa-solid fa-calendar-days nav-ic"></i> Jadwal</a>
+        <a class="nav-item" data-page="annual" onclick="UIService.navigate('annual')"><i class="fa-solid fa-calendar-week nav-ic"></i> Annual Activity</a>
+        <a class="nav-item" data-page="locations" onclick="UIService.navigate('locations')"><i class="fa-solid fa-sitemap nav-ic"></i> Lokasi &amp; Fasilitas</a>
+        <a class="nav-item" data-page="overdue" onclick="UIService.navigate('overdue')"><i class="fa-solid fa-fire nav-ic"></i> Overdue Command</a>
+
+        <div class="nav-section-label">Compliance</div>
+        <a class="nav-item" data-page="documents" onclick="UIService.navigate('documents')"><i class="fa-solid fa-folder-open nav-ic"></i> Dokumen</a>
+        <a class="nav-item" data-page="audit" onclick="UIService.navigate('audit')"><i class="fa-solid fa-clipboard-check nav-ic"></i> Audit Trail</a>
+        <a class="nav-item" data-page="reports" onclick="UIService.navigate('reports')"><i class="fa-solid fa-chart-column nav-ic"></i> Reports</a>
+
+        <div class="nav-section-label">Sistem</div>
+        <a class="nav-item" data-page="masterdata" onclick="UIService.navigate('masterdata')"><i class="fa-solid fa-database nav-ic"></i> Master Data</a>
+        <a class="nav-item" data-page="settings" onclick="UIService.navigate('settings')"><i class="fa-solid fa-gear nav-ic"></i> Settings</a>
+      </div>
+      <div class="sidebar-foot">SF.Track Pro v0.5 &middot; Enterprise Command Center</div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="sidebarToggle" title="Sembunyikan / tampilkan menu" aria-label="Sembunyikan atau tampilkan menu" onclick="UIService.toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <div class="loc-select-wrap">
+          <i class="fa-solid fa-location-dot loc-ic"></i>
+          <select class="loc-select" id="locationSelect" onchange="UIService.onLocationChange()"></select>
+          <i class="fa-solid fa-chevron-down chev"></i>
+        </div>
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="globalSearchInput" placeholder="Cari SF, lokasi, fungsi, fasilitas, PIC, status..." oninput="GlobalSearch.onInput(this.value)" onfocus="GlobalSearch.onInput(this.value)">
+          <div class="dropdown-panel" id="globalSearchPanel" style="left:0; right:auto; width:360px; max-height:400px; overflow-y:auto;"></div>
+        </div>
+        <div class="topbar-right">
+          <button class="icon-btn" id="themeToggle" title="Ganti tema gelap / terang" aria-label="Ganti tema gelap atau terang" onclick="UIService.toggleTheme()"><i class="fa-solid fa-moon theme-ic-dark"></i><i class="fa-solid fa-sun theme-ic-light"></i></button>
+          <div style="position:relative;">
+            <button class="icon-btn" onclick="UIService.togglePanel('notifPanel')"><i class="fa-solid fa-bell"></i><span class="badge-dot" id="notifCount">0</span></button>
+            <div class="dropdown-panel notif-panel" id="notifPanel"></div>
+          </div>
+          <div style="position:relative;">
+            <div class="profile-wrap" onclick="UIService.togglePanel('profilePanel')">
+              <div class="avatar" id="avatarInitials">--</div>
+              <div class="profile-meta">
+                <div class="profile-name" id="profileName">-</div>
+                <div class="profile-role" id="profileRole">-</div>
+              </div>
+              <i class="fa-solid fa-chevron-down" style="font-size:10px; color:var(--muted);"></i>
+            </div>
+            <div class="dropdown-panel" id="profilePanel">
+              <div class="dp-head" id="profilePanelHead">-</div>
+              <a class="dropdown-item"><i class="fa-solid fa-user"></i> My Profile</a>
+              <a class="dropdown-item"><i class="fa-solid fa-gear"></i> Preferensi</a>
+              <a class="dropdown-item danger" onclick="AuthService.logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content" id="pageContent"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="modal-scrim" id="sfModalScrim"><div class="modal-box" id="sfModalBox"></div></div>
+<input type="file" id="hiddenFileInput" accept=".xlsx,.xls,.docx,.doc" style="display:none;">
+
+<script>
+/* ============ DatabaseService ============ */
+/* ---- Calendar-date helpers (LOCAL calendar dates, never UTC-shifted; storage format stays ISO YYYY-MM-DD) ---- */
+/** Display name of a master-data record by id ('-' if missing). Shared by all pages. */
+function refName(coll, id){ const r = DatabaseService.get(coll).find(x=>x.id===id); return r ? r.name : '-'; }
+const _p2 = n => String(n).padStart(2,'0');
+function isoDate(d){ d = d || new Date(); return d.getFullYear()+'-'+_p2(d.getMonth()+1)+'-'+_p2(d.getDate()); }
+function todayISO(){ return isoDate(new Date()); }
+function addDaysISO(s, n){ const [y,m,d] = String(s).slice(0,10).split('-').map(Number); const t = new Date(Date.UTC(y, m-1, d+n)); return t.getUTCFullYear()+'-'+_p2(t.getUTCMonth()+1)+'-'+_p2(t.getUTCDate()); }
+/** Adds whole months; day is clamped to the target month's length (Jan 31 + 1 month = Feb 28/29), anchorDay restores the original day later (Feb 28 -> Mar 31). */
+function addMonthsISO(s, n, anchorDay){
+  const [y,m,d] = String(s).slice(0,10).split('-').map(Number);
+  const want = Math.max(d, anchorDay||0);
+  const total = y*12 + (m-1) + n, ny = Math.floor(total/12), nm = total % 12;
+  const dim = new Date(Date.UTC(ny, nm+1, 0)).getUTCDate();
+  return ny+'-'+_p2(nm+1)+'-'+_p2(Math.min(want, dim));
+}
+
+/* ---- LocalStorage SCHEMA MAP (all keys are prefixed 'sftrack_'; existing key names are intentionally unchanged) ----
+   sftrack_users              [{id,username,password(demo plaintext),name,role,initials}]
+   sftrack_locations          [{id,name,code,status:'ACTIVE'|'INACTIVE'}]
+   sftrack_functions          [{id,name,icon,status}]
+   sftrack_facilities         [{id,name,locationId,functionId,status}]
+   sftrack_responsiblePersons [{id,name,employeeId,department,locationId,status}]
+   sftrack_standardForms      [{id,sfNumber,sfTitle,description,locationId,functionId,facilityId,frequency,responsiblePerson(text snapshot),
+                                status,templateFile,lastFilledDate,nextDueDate,createdDate,updatedDate}]   dates stored as ISO YYYY-MM-DD
+   sftrack_schedules          [{id,sfId,locationId,functionId,facilityId,scheduledDate,dueDate,completedDate,status,responsiblePerson,submissionId,generatedAt}]
+   sftrack_submissions        reserved (submissions are modelled as 'documents' of type COMPLETED)
+   sftrack_documents          [{id,sfId,scheduleId,type,name,type(mime),size,dataUrl,uploadedBy,uploadedAt,status,remark,reviewedBy,reviewedAt,cancellationReason}]
+   sftrack_notifications      [{id,type,title,message,relatedSFId,relatedScheduleId,createdDate,readStatus}]  (rebuilt from state; read flag preserved)
+   sftrack_auditLogs          [{id,timestamp,user,role,action,object,objectId,oldValue,newValue,ip,remarks}]
+   sftrack_settings           {dateFormat,defaultDashboard,theme,notifTypesEnabled}
+   sftrack_config             {dueSoonWarningDays}
+   sftrack_ui                 {sidebarCollapsed}  (per-browser layout preference)
+   sftrack_session / sftrack_seeded / sftrack_rp_migrated   (flags)
+   Master-data status: records without a 'status' are treated as ACTIVE (migrateMasterStatus adds it non-destructively). */
+const DatabaseService = (function(){
+  const PREFIX = 'sftrack_';
+  const COLLECTIONS = ['users','locations','functions','facilities','responsiblePersons','standardForms','schedules','submissions','documents','notifications','auditLogs'];
+  function key(c){ return PREFIX + c; }
+  function get(c){ try{ const raw = localStorage.getItem(key(c)); return raw ? JSON.parse(raw) : []; }catch(e){ console.error('DB get error', c, e); return []; } }
+  function set(c, data){ try{ localStorage.setItem(key(c), JSON.stringify(data)); return true; }catch(e){ console.error('DB set error', c, e); return false; } }
+  function insert(c, record){ const arr = get(c); arr.push(record); set(c, arr); return record; }
+  function update(c, id, patch){ const arr = get(c); const i = arr.findIndex(r=>r.id===id); if(i>-1){ arr[i] = Object.assign({}, arr[i], patch); set(c, arr); return arr[i]; } return null; }
+  function remove(c, id){ const arr = get(c).filter(r=>r.id!==id); set(c, arr); }
+  function uid(prefix){ return (prefix||'id') + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function isSeeded(){ try{ return localStorage.getItem(PREFIX+'seeded') === 'true'; }catch(e){ return false; } }
+  function markSeeded(){ try{ localStorage.setItem(PREFIX+'seeded','true'); }catch(e){} }
+  function resetAll(){ COLLECTIONS.forEach(c=>localStorage.removeItem(key(c))); localStorage.removeItem(PREFIX+'seeded'); localStorage.removeItem(PREFIX+'session'); localStorage.removeItem(PREFIX+'rp_migrated'); }
+  /** Read-only integrity check: returns a list of dangling references (empty list = consistent). */
+  function verifyIntegrity(){
+    const issues = [];
+    const ids = c => new Set(get(c).map(r=>r.id));
+    const loc = ids('locations'), fn = ids('functions'), fac = ids('facilities'), sf = ids('standardForms');
+    get('facilities').forEach(f=>{ if(!loc.has(f.locationId)) issues.push('facility '+f.id+' -> missing location'); if(!fn.has(f.functionId)) issues.push('facility '+f.id+' -> missing function'); });
+    get('standardForms').forEach(f=>{ if(!loc.has(f.locationId)) issues.push('SF '+f.id+' -> missing location'); if(!fn.has(f.functionId)) issues.push('SF '+f.id+' -> missing function'); if(!fac.has(f.facilityId)) issues.push('SF '+f.id+' -> missing facility'); });
+    get('schedules').forEach(s=>{ if(!sf.has(s.sfId)) issues.push('schedule '+s.id+' -> missing SF'); });
+    get('documents').forEach(d=>{ if(!sf.has(d.sfId)) issues.push('document '+d.id+' -> missing SF'); });
+    return issues;
+  }
+  return { get, set, insert, update, remove, uid, isSeeded, markSeeded, resetAll, verifyIntegrity, COLLECTIONS };
+})();
+
+/* ============ AuditService ============ */
+/* Structured audit trail: Timestamp, User, Role, Action, Object, Object ID, Old Value, New Value, IP placeholder, Remarks.
+   NOTE (prototype disclaimer): entries are stored as plain LocalStorage records, which are NOT tamper-proof or
+   enterprise-grade secure. A production build must persist this server-side (see FileService note below). */
+const AuditService = (function(){
+  function log(opts){
+    const u = (typeof AuthService !== 'undefined') ? AuthService.currentUser() : null;
+    const entry = {
+      id: DatabaseService.uid('log'),
+      timestamp: new Date().toISOString(),
+      user: (opts.user) || (u ? u.username : 'system'),
+      role: (opts.role) || (u ? u.role : 'System'),
+      action: opts.action || 'UNKNOWN',
+      object: opts.object || '-',
+      objectId: opts.objectId || '-',
+      oldValue: (opts.oldValue!==undefined && opts.oldValue!==null) ? String(opts.oldValue) : '-',
+      newValue: (opts.newValue!==undefined && opts.newValue!==null) ? String(opts.newValue) : '-',
+      ip: '127.0.0.1 (prototype placeholder)',
+      remarks: opts.remarks || ''
+    };
+    DatabaseService.insert('auditLogs', entry);
+    return entry;
+  }
+  function all(){ return DatabaseService.get('auditLogs').slice().sort((a,b)=> a.timestamp < b.timestamp ? 1 : -1); }
+  function forObject(objectId){ return all().filter(l=>l.objectId===objectId); }
+  return { log, all, forObject };
+})();
+
+/* ============ Migration: upgrade SF schema to full field set ============ */
+function migrateStandardForms(){
+  const forms = DatabaseService.get('standardForms');
+  if(!forms.length) return;
+  let changed = false;
+  const upgraded = forms.map((f,idx)=>{
+    if(f.sfTitle) return f; // already migrated
+    changed = true;
+    const today = todayISO();
+    return {
+      id: f.id,
+      sfNumber: 'SF-' + (f.facilityId||'GEN').replace('fac_','').toUpperCase() + '-' + String(idx+1).padStart(3,'0'),
+      sfTitle: f.title || ('Inspeksi Rutin - ' + (f.facilityId||'')),
+      description: '',
+      locationId: f.locationId,
+      functionId: f.functionId,
+      facilityId: f.facilityId,
+      frequency: f.frequency || 'Monthly',
+      responsiblePerson: idx % 2===0 ? 'Ozzy Refandi' : 'Budi Santoso',
+      status: f.status || 'NOT_STARTED',
+      templateFile: f.hasDocument ? {name:'Template-Demo.xlsx', type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', size:0, dataUrl:null, demo:true} : null,
+      lastFilledDate: f.status==='COMPLETED' ? today : null,
+      nextDueDate: f.dueDate || today,
+      createdDate: today,
+      updatedDate: today
+    };
+  });
+  if(changed) DatabaseService.set('standardForms', upgraded);
+}
+
+/* ============ Migration: drop obsolete pre-scheduler-engine schedule rows ============ */
+function migrateSchedules(){
+  const schedules = DatabaseService.get('schedules');
+  const clean = schedules.filter(s => s.scheduledDate && s.dueDate !== undefined);
+  if(clean.length !== schedules.length) DatabaseService.set('schedules', clean);
+}
+
+/* ============ ScheduleService (Smart Recurring Scheduler) ============ */
+const ScheduleService = (function(){
+  const CONFIG_KEY = 'sftrack_config';
+  function getConfig(){ try{ return JSON.parse(localStorage.getItem(CONFIG_KEY)) || {dueSoonWarningDays:3}; }catch(e){ return {dueSoonWarningDays:3}; } }
+  function setWarningDays(n){ const c = getConfig(); c.dueSoonWarningDays = Math.max(1, parseInt(n)||3); try{ localStorage.setItem(CONFIG_KEY, JSON.stringify(c)); }catch(e){} }
+  function todayStr(){ return todayISO(); }
+  function daysBetween(a,b){ return Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00')) / 86400000); }
+
+  function calculateNextDueDate(fromDateStr, frequency, anchorDay){
+    switch(frequency){
+      case 'Weekly': return addDaysISO(fromDateStr, 7);
+      case 'Monthly': return addMonthsISO(fromDateStr, 1, anchorDay);
+      case 'Every 3 Months': return addMonthsISO(fromDateStr, 3, anchorDay);
+      case 'Every 6 Months': return addMonthsISO(fromDateStr, 6, anchorDay);
+      case 'Yearly': return addMonthsISO(fromDateStr, 12, anchorDay);
+      default: return addMonthsISO(fromDateStr, 1, anchorDay);
+    }
+  }
+  /** Day-of-month the cycle is anchored to (so month-end clamping never drifts permanently). */
+  function anchorDay(sf, chain){
+    let a = 0;
+    chain.forEach(s=>{ a = Math.max(a, +String(s.dueDate).slice(8,10)); });
+    if(chain.length && chain[0].scheduledDate===sf.createdDate) a = Math.max(a, +String(sf.createdDate).slice(8,10));
+    return a || undefined;
+  }
+
+  /** Pure function: computes what a schedule's status SHOULD be right now. Never mutates. */
+  function updateScheduleStatus(schedule, warningDays){
+    if(schedule.completedDate) return 'COMPLETED';
+    const today = todayStr();
+    const wd = warningDays != null ? warningDays : getConfig().dueSoonWarningDays;
+    if(schedule.dueDate === today) return 'DUE_TODAY';
+    if(schedule.dueDate < today) return 'OVERDUE';
+    if(daysBetween(today, schedule.dueDate) <= wd) return 'DUE_SOON';
+    return 'NOT_STARTED';
+  }
+  function checkOverdue(schedule){ return !schedule.completedDate && schedule.dueDate < todayStr(); }
+  function checkDueSoon(schedule, warningDays){
+    if(schedule.completedDate) return false;
+    const wd = warningDays != null ? warningDays : getConfig().dueSoonWarningDays;
+    const d = daysBetween(todayStr(), schedule.dueDate);
+    return d >= 0 && d <= wd;
+  }
+
+  function schedulesForSF(sfId){ return DatabaseService.get('schedules').filter(s=>s.sfId===sfId).sort((a,b)=> a.scheduledDate < b.scheduledDate ? -1 : 1); }
+
+  function exists(sfId, scheduledDate){ return DatabaseService.get('schedules').some(s=>s.sfId===sfId && s.scheduledDate===scheduledDate); }
+
+  function createScheduleRecord(sf, scheduledDate, anchor){
+    const dueDate = calculateNextDueDate(scheduledDate, sf.frequency, anchor);
+    // First-ever schedule for a brand-new SF: due date is one cycle after the SF's creation/start point.
+    const rec = {
+      id: DatabaseService.uid('sch'),
+      sfId: sf.id,
+      locationId: sf.locationId,
+      functionId: sf.functionId,
+      facilityId: sf.facilityId,
+      scheduledDate: scheduledDate,
+      dueDate: dueDate,
+      completedDate: null,
+      status: 'NOT_STARTED',
+      responsiblePerson: sf.responsiblePerson || '-',
+      submissionId: null,
+      generatedAt: new Date().toISOString()
+    };
+    rec.status = updateScheduleStatus(rec);
+    DatabaseService.insert('schedules', rec);
+    return rec;
+  }
+
+  /** Ensures every active SF has exactly one open (non-completed) schedule, generating the
+   *  first occurrence for brand-new SFs and the NEXT occurrence right after a completion.
+   *  Idempotent & duplicate-safe: safe to call on every boot / navigation / CRUD action. */
+  function generateRecurringSchedules(){
+    const forms = DatabaseService.get('standardForms').filter(f=>f.status!=='CANCELLED');
+    forms.forEach(sf=>{
+      const chain = schedulesForSF(sf.id);
+      if(chain.length === 0){
+        // brand-new SF: first occurrence starts from its creation date
+        if(!exists(sf.id, sf.createdDate)) createScheduleRecord(sf, sf.createdDate);
+        return;
+      }
+      const last = chain[chain.length-1];
+      if(last.completedDate){
+        // last cycle done -> spawn the next occurrence, anchored on the previous due date
+        if(!exists(sf.id, last.dueDate)) createScheduleRecord(sf, last.dueDate, anchorDay(sf, chain));
+      }
+      // else: an open (not yet completed) schedule already exists -> do nothing (no duplicates)
+    });
+  }
+
+  /** Recomputes status on every still-open schedule so OVERDUE/DUE_TODAY/DUE_SOON stay fresh. */
+  function refreshAllStatuses(){
+    const schedules = DatabaseService.get('schedules');
+    let changed = false;
+    const updated = schedules.map(s=>{
+      if(s.completedDate) return s;
+      const fresh = updateScheduleStatus(s);
+      if(fresh !== s.status){ changed = true; return Object.assign({}, s, {status:fresh}); }
+      return s;
+    });
+    if(changed) DatabaseService.set('schedules', updated);
+  }
+
+  /** Mirrors each SF's current obligation (its latest open schedule's status) onto the SF record,
+   *  so existing Dashboard / Standard Form table code keeps reading sf.status unchanged. */
+  function syncSFStatuses(){
+    const forms = DatabaseService.get('standardForms');
+    let changed = false;
+    const updated = forms.map(f=>{
+      if(f.status==='CANCELLED') return f;
+      const chain = schedulesForSF(f.id);
+      const active = chain.slice().reverse().find(s=>!s.completedDate) || chain[chain.length-1];
+      if(active && active.status !== f.status){ changed = true; return Object.assign({}, f, {status:active.status, nextDueDate:active.dueDate}); }
+      return f;
+    });
+    if(changed) DatabaseService.set('standardForms', updated);
+  }
+
+  /** Runs the full scheduler pipeline. Safe to call as often as needed. */
+  function runScheduler(){
+    generateRecurringSchedules();
+    refreshAllStatuses();
+    generateRecurringSchedules(); // catch any schedule that just became eligible after status refresh
+    syncSFStatuses();
+    NotificationService.generate();
+  }
+
+  /** Marks a schedule COMPLETED and immediately generates the next occurrence in the chain. */
+  function completeSchedule(scheduleId, opts){
+    opts = opts || {};
+    const rec = DatabaseService.update('schedules', scheduleId, {
+      completedDate: opts.completedDate || todayStr(),
+      status: 'COMPLETED',
+      submissionId: opts.submissionId || DatabaseService.uid('sub'),
+      responsiblePerson: opts.responsiblePerson || (DatabaseService.get('schedules').find(s=>s.id===scheduleId)||{}).responsiblePerson
+    });
+    if(rec){
+      DatabaseService.update('standardForms', rec.sfId, { lastFilledDate: rec.completedDate });
+      AuditService.log({action:'SCHEDULE_COMPLETE', object:'Schedule', objectId:scheduleId, oldValue:'OPEN', newValue:'COMPLETED', remarks:'Schedule diselesaikan untuk SF: '+rec.sfId});
+    }
+    runScheduler();
+    return rec;
+  }
+
+  /** Schedules whose Standard Form still exists and is not CANCELLED (single source for every metric/report). */
+  function activeSchedules(){
+    const live = new Set(DatabaseService.get('standardForms').filter(f=>f.status!=='CANCELLED').map(f=>f.id));
+    return DatabaseService.get('schedules').filter(s=>live.has(s.sfId));
+  }
+  function getOverdueList(locationId){
+    let list = activeSchedules().filter(s=>!s.completedDate && s.dueDate < todayStr());
+    if(locationId && locationId!=='all') list = list.filter(s=>s.locationId===locationId);
+    return list.sort((a,b)=> a.dueDate < b.dueDate ? -1 : 1);
+  }
+
+  return {
+    calculateNextDueDate, updateScheduleStatus, checkOverdue, checkDueSoon,
+    generateRecurringSchedules, refreshAllStatuses, syncSFStatuses, runScheduler,
+    completeSchedule, getOverdueList, activeSchedules, anchorDay, schedulesForSF, getConfig, setWarningDays, daysBetween, todayStr
+  };
+})();
+
+/* ============ FileService ============ */
+/* Abstraction boundary for file storage. Today: reads to base64 dataURL and persists inside the
+   'documents'/'standardForms' LocalStorage records. To migrate to real cloud storage (S3/Firebase/etc.)
+   later, only upload()/download() need to change — callers everywhere else stay the same. */
+const FileService = (function(){
+  const ACCEPTED_EXT = ['.xlsx','.xls','.docx','.doc','.pdf','.jpg','.jpeg','.png'];
+  function readAsDataURL(file){
+    return new Promise((resolve,reject)=>{
+      const r = new FileReader();
+      r.onload = ()=>resolve(r.result);
+      r.onerror = ()=>reject(new Error('Gagal membaca file'));
+      r.readAsDataURL(file);
+    });
+  }
+  function isAcceptedType(fileName){
+    const lower = fileName.toLowerCase();
+    return ACCEPTED_EXT.some(ext=>lower.endsWith(ext));
+  }
+  async function upload(file){
+    if(!isAcceptedType(file.name)){ throw new Error('Tipe file tidak didukung. Gunakan: ' + ACCEPTED_EXT.join(', ')); }
+    if(file.size > 4*1024*1024){ throw new Error('Ukuran file maksimal 4MB untuk prototype ini.'); }
+    const dataUrl = await readAsDataURL(file);
+    return { name:file.name, type:file.type, size:file.size, dataUrl, demo:false };
+  }
+  async function download(fileObj, meta){
+    if(!fileObj){ UIService.showToast('Tidak ada file untuk diunduh.'); return; }
+    if(fileObj.demo || !fileObj.dataUrl){ UIService.showToast('File demo ini tidak memiliki data unduhan nyata.'); return; }
+    try{
+      const dl = (typeof claude !== 'undefined' && claude.use) ? await claude.use('downloads') : null;
+      const res = await fetch(fileObj.dataUrl);
+      const blob = await res.blob();
+      if(dl){
+        await dl.save({ filename: fileObj.name, data: blob });
+      } else {
+        const a = document.createElement('a'); a.href = fileObj.dataUrl; a.download = fileObj.name; document.body.appendChild(a); a.click(); a.remove();
+      }
+      UIService.showToast('File berhasil diunduh: ' + fileObj.name);
+      if(meta) AuditService.log(Object.assign({action:'DOWNLOAD_FILE', newValue:fileObj.name}, meta));
+    }catch(e){
+      if(e && e.code === 'declined'){ return; }
+      console.error('Download error', e);
+      UIService.showToast('Gagal mengunduh file.');
+    }
+  }
+  return { upload, download, isAcceptedType, ACCEPTED_EXT };
+})();
+
+/* ============ DocumentService (Document Control) ============ */
+const DocumentService = (function(){
+  function all(){ return DatabaseService.get('documents'); }
+  function forSF(sfId){ return all().filter(d=>d.sfId===sfId).sort((a,b)=> a.uploadedAt < b.uploadedAt ? 1 : -1); }
+  function latestForSF(sfId){ const list = forSF(sfId); return list.length ? list[0] : null; }
+  function get(id){ return all().find(d=>d.id===id) || null; }
+
+  async function uploadCompleted(sfId, file){
+    if(!AuthService.guard('UPLOAD_COMPLETED_FILE')) return null;
+    if(!SFService.get(sfId)) throw new Error('Standard Form tidak ditemukan.');
+    const fileData = await FileService.upload(file);
+    const sf = SFService.get(sfId);
+    const chain = ScheduleService.schedulesForSF(sfId);
+    const active = chain.slice().reverse().find(s=>!s.completedDate) || null;
+    const u = AuthService.currentUser();
+    const doc = Object.assign({
+      id: DatabaseService.uid('doc'), sfId: sfId, scheduleId: active?active.id:null, type:'COMPLETED',
+      uploadedBy: u?u.username:'system', uploadedByRole: u?u.role:'-', uploadedAt: new Date().toISOString(),
+      status:'PENDING', remark:'', reviewedBy:null, reviewedAt:null, cancellationReason:null
+    }, fileData);
+    DatabaseService.insert('documents', doc);
+    if(active) DatabaseService.update('schedules', active.id, {submissionId: doc.id});
+    AuditService.log({action:'UPLOAD_COMPLETED_FILE', object:'Document', objectId:doc.id, newValue:doc.name, remarks:'Upload dokumen terisi untuk: '+(sf?sf.sfTitle:sfId)});
+    NotificationService.generate();
+    return doc;
+  }
+
+  function approve(docId, remark){
+    if(!AuthService.guard('APPROVE')) return null;
+    const doc = get(docId); if(!doc) return null;
+    if(doc.status!=='PENDING'){ UIService.showToast('Dokumen ini sudah direview (status: '+doc.status+').'); return null; }
+    const updated = DatabaseService.update('documents', docId, { status:'APPROVED', remark: remark||doc.remark||'', reviewedBy:(AuthService.currentUser()||{}).username||'system', reviewedAt:new Date().toISOString() });
+    AuditService.log({action:'APPROVE', object:'Document', objectId:docId, oldValue:'PENDING', newValue:'APPROVED', remarks:remark||''});
+    const sch = doc.scheduleId ? DatabaseService.get('schedules').find(s=>s.id===doc.scheduleId) : null;
+    if(sch && !sch.completedDate) ScheduleService.completeSchedule(doc.scheduleId, {submissionId:docId});
+    NotificationService.generate();
+    return updated;
+  }
+
+  function reject(docId, reason){
+    if(!AuthService.guard('REJECT')) return null;
+    if(!reason || !reason.trim()) throw new Error('Alasan pembatalan wajib diisi.');
+    const doc = get(docId); if(!doc) return null;
+    if(doc.status!=='PENDING'){ UIService.showToast('Dokumen ini sudah direview (status: '+doc.status+').'); return null; }
+    const updated = DatabaseService.update('documents', docId, { status:'CANCELLED', cancellationReason:reason.trim(), reviewedBy:(AuthService.currentUser()||{}).username||'system', reviewedAt:new Date().toISOString() });
+    if(doc.scheduleId) DatabaseService.update('schedules', doc.scheduleId, {submissionId:null});
+    AuditService.log({action:'REJECT', object:'Document', objectId:docId, oldValue:'PENDING', newValue:'REJECTED', remarks:reason.trim()});
+    AuditService.log({action:'CANCEL', object:'Document', objectId:docId, oldValue:'PENDING', newValue:'CANCELLED', remarks:'Alasan: '+reason.trim()});
+    NotificationService.generate();
+    return updated;
+  }
+
+  function addRemark(docId, remark){
+    if(!AuthService.guard('REVIEW_SUBMISSION')) return null;
+    const updated = DatabaseService.update('documents', docId, {remark:remark});
+    AuditService.log({action:'ADD_REMARK', object:'Document', objectId:docId, newValue:remark, remarks:'Menambahkan catatan pada dokumen'});
+    return updated;
+  }
+
+  return { all, forSF, latestForSF, get, uploadCompleted, approve, reject, addRemark };
+})();
+
+/* ============ NotificationService ============ */
+const NotificationService = (function(){
+  function all(){ return DatabaseService.get('notifications').slice().sort((a,b)=> a.createdDate < b.createdDate ? 1 : -1); }
+  function unreadCount(){ return all().filter(n=>!n.readStatus).length; }
+  function keyOf(type, relId){ return type+'::'+relId; }
+
+  /** Rebuilds the notification list from real scheduler/document state every time it's called.
+   *  Existing (still-applicable) notifications keep their id and read status; ones whose
+   *  underlying condition no longer holds are dropped; new ones are inserted unread. */
+  function generate(){
+    const existing = DatabaseService.get('notifications');
+    const byKey = {}; existing.forEach(n=>{ byKey[keyOf(n.type, n.relatedScheduleId||n.relatedSFId)] = n; });
+    const seen = {};
+    const result = [];
+    function upsert(type, relatedSFId, relatedScheduleId, title, message){
+      const key = keyOf(type, relatedScheduleId||relatedSFId);
+      if(seen[key]) return; // avoid duplicate within this pass
+      seen[key] = true;
+      const prev = byKey[key];
+      result.push(prev || { id: DatabaseService.uid('notif'), type, title, message, relatedSFId: relatedSFId||null, relatedScheduleId: relatedScheduleId||null, createdDate: new Date().toISOString(), readStatus:false });
+    }
+    const forms = DatabaseService.get('standardForms');
+    DatabaseService.get('schedules').forEach(s=>{
+      if(s.completedDate) return;
+      const sf = forms.find(f=>f.id===s.sfId); if(!sf || sf.status==='CANCELLED') return;
+      const status = ScheduleService.updateScheduleStatus(s);
+      if(status==='OVERDUE') upsert('OVERDUE', sf.id, s.id, 'Standard Form Overdue', sf.sfTitle+' melewati batas waktu ({{date:'+s.dueDate+'}}).');
+      else if(status==='DUE_TODAY') upsert('DUE_TODAY', sf.id, s.id, 'Jatuh Tempo Hari Ini', sf.sfTitle+' harus diselesaikan hari ini.');
+      else if(status==='DUE_SOON') upsert('DUE_SOON', sf.id, s.id, 'Segera Jatuh Tempo', sf.sfTitle+' akan jatuh tempo pada {{date:'+s.dueDate+'}}.');
+    });
+    forms.forEach(f=>{ if(f.status!=='CANCELLED' && !f.templateFile) upsert('MISSING_DOCUMENT', f.id, null, 'Dokumen Template Hilang', f.sfTitle+' belum memiliki template dokumen.'); });
+    DocumentService.all().forEach(d=>{
+      const sf = forms.find(f=>f.id===d.sfId); const label = sf?sf.sfTitle:d.sfId;
+      if(d.status==='PENDING'){
+        upsert('SUPERVISOR_REVIEW_REQUIRED', d.sfId, d.scheduleId, 'Menunggu Review Supervisor', 'Dokumen '+d.name+' untuk '+label+' menunggu persetujuan.');
+        upsert('NEW_SUBMISSION', d.sfId, d.scheduleId, 'Submission Baru', d.uploadedBy+' mengunggah '+d.name+' untuk '+label+'.');
+      }
+      if(d.status==='CANCELLED') upsert('CANCELLED_SUBMISSION', d.sfId, d.scheduleId, 'Submission Dibatalkan', 'Dokumen '+d.name+' untuk '+label+' dibatalkan: '+(d.cancellationReason||'-'));
+    });
+    DatabaseService.set('notifications', result);
+    return result;
+  }
+  function markRead(id){ DatabaseService.update('notifications', id, {readStatus:true}); }
+  function markAllRead(){ DatabaseService.set('notifications', DatabaseService.get('notifications').map(n=>Object.assign({}, n, {readStatus:true}))); }
+
+  /** Placeholder interface only. Intentionally does NOT call any real WhatsApp/cloud API —
+   *  wire this to a real backend endpoint (e.g. a server-side WhatsApp Business API proxy) later. */
+  function sendWhatsApp(payload){
+    console.info('[NotificationService.sendWhatsApp] placeholder — no backend configured.', payload);
+    return Promise.resolve({ sent:false, reason:'WhatsApp integration not implemented in this prototype; requires a backend endpoint.' });
+  }
+  return { all, unreadCount, generate, markRead, markAllRead, sendWhatsApp };
+})();
+
+/* ============ SFService ============ */
+const SFService = (function(){
+  function all(){ return DatabaseService.get('standardForms'); }
+  function get(id){ return all().find(f=>f.id===id) || null; }
+  function list(opts){
+    opts = opts || {};
+    let forms = all();
+    if(opts.locationId && opts.locationId!=='all') forms = forms.filter(f=>f.locationId===opts.locationId);
+    if(opts.functionId && opts.functionId!=='all') forms = forms.filter(f=>f.functionId===opts.functionId);
+    if(opts.status && opts.status!=='all') forms = forms.filter(f=>f.status===opts.status);
+    if(opts.search){
+      const q = opts.search.toLowerCase();
+      forms = forms.filter(f => (f.sfTitle||'').toLowerCase().includes(q) || (f.sfNumber||'').toLowerCase().includes(q) || (f.responsiblePerson||'').toLowerCase().includes(q));
+    }
+    if(opts.sortBy){
+      forms = forms.slice().sort((a,b)=>{
+        const av = (a[opts.sortBy]||''), bv = (b[opts.sortBy]||'');
+        return av > bv ? 1 : av < bv ? -1 : 0;
+      });
+    }
+    return forms;
+  }
+  function nextSfNumber(facilityId){
+    const count = all().filter(f=>f.facilityId===facilityId).length + 1;
+    return 'SF-' + (facilityId||'GEN').replace('fac_','').toUpperCase() + '-' + String(count).padStart(3,'0');
+  }
+  function create(data){
+    if(!AuthService.guard('CREATE_SF')) return null;
+    const today = todayISO();
+    const record = Object.assign({
+      id: DatabaseService.uid('sf'),
+      status: 'NOT_STARTED',
+      lastFilledDate: null,
+      createdDate: today,
+      updatedDate: today
+    }, data);
+    record.nextDueDate = ScheduleService.calculateNextDueDate(today, record.frequency);
+    DatabaseService.insert('standardForms', record);
+    ScheduleService.runScheduler();
+    AuditService.log({action:'CREATE_SF', object:'StandardForm', objectId:record.id, oldValue:null, newValue:record.sfTitle, remarks:'Membuat Standard Form baru'});
+    return record;
+  }
+  function update(id, patch){
+    if(!AuthService.guard('EDIT_SF')) return null;
+    const before = get(id);
+    patch.updatedDate = todayISO();
+    const rec = DatabaseService.update('standardForms', id, patch);
+    if(rec){
+      AuditService.log({action:'EDIT_SF', object:'StandardForm', objectId:id, oldValue: before?before.sfTitle:'-', newValue:rec.sfTitle, remarks:'Mengubah data Standard Form'});
+      ScheduleService.runScheduler();
+    }
+    return rec;
+  }
+  function remove(id){
+    if(!AuthService.guard('DELETE_SF')) return false;
+    const rec = get(id);
+    if(!rec) return false;
+    DatabaseService.remove('standardForms', id);
+    if(rec){
+      DatabaseService.set('schedules', DatabaseService.get('schedules').filter(s=>s.sfId!==id));
+      DatabaseService.set('documents', DatabaseService.get('documents').filter(d=>d.sfId!==id));
+      AuditService.log({action:'DELETE_SF', object:'StandardForm', objectId:id, oldValue:rec.sfTitle, newValue:null, remarks:'Menghapus Standard Form beserta jadwal & dokumen terkait'});
+    }
+    return true;
+  }
+  function duplicate(id){
+    if(!AuthService.guard('DUPLICATE_SF')) return null;
+    const src = get(id);
+    if(!src) return null;
+    const today = todayISO();
+    const copy = Object.assign({}, src, {
+      id: DatabaseService.uid('sf'),
+      sfNumber: nextSfNumber(src.facilityId),
+      sfTitle: src.sfTitle + ' (Copy)',
+      status: 'NOT_STARTED',
+      lastFilledDate: null,
+      createdDate: today,
+      updatedDate: today
+    });
+    copy.nextDueDate = ScheduleService.calculateNextDueDate(today, copy.frequency);
+    DatabaseService.insert('standardForms', copy);
+    ScheduleService.runScheduler();
+    AuditService.log({action:'DUPLICATE_SF', object:'StandardForm', objectId:copy.id, oldValue:src.sfTitle, newValue:copy.sfTitle, remarks:'Menduplikasi Standard Form'});
+    return copy;
+  }
+  return { all, get, list, create, update, remove, duplicate, nextSfNumber };
+})();
+
+/* ============ Demo data seeding ============ */
+function seedDemoData(){
+  if(DatabaseService.isSeeded()) return;
+
+  DatabaseService.set('users', [
+    {id:'u_admin', username:'admin', password:'admin123', name:'Ozzy Refandi', role:'Admin', initials:'OR'},
+    {id:'u_sup', username:'supervisor', password:'supervisor123', name:'Budi Santoso', role:'Supervisor', initials:'BS'}
+  ]);
+
+  const locations = [
+    {id:'loc_main', name:'Main Location', code:'MAIN'},
+    {id:'loc_b1', name:'Branch 01', code:'BR01'},
+    {id:'loc_b2', name:'Branch 02', code:'BR02'},
+    {id:'loc_b3', name:'Branch 03', code:'BR03'}
+  ];
+  DatabaseService.set('locations', locations);
+
+  const functions = [
+    {id:'fn_maint', name:'Maintenance', icon:'fa-screwdriver-wrench'},
+    {id:'fn_rsd', name:'Receiving Storage & Distribution (R.S&D)', icon:'fa-truck-ramp-box'},
+    {id:'fn_hsse', name:'HSSE', icon:'fa-shield-halved'}
+  ];
+  DatabaseService.set('functions', functions);
+
+  const facilities = [];
+  for(let i=1;i<=24;i++){
+    const num = String(i).padStart(2,'0');
+    facilities.push({id:'fac_kna'+num, name:'KNA '+num, functionId:'fn_maint', locationId: locations[i % locations.length].id});
+  }
+  [341,342,343,344,345].forEach((n,idx)=>facilities.push({id:'fac_hp'+n, name:'Hydrant Pump PU '+n, functionId:'fn_rsd', locationId: locations[idx % locations.length].id}));
+  [321,322].forEach((n,idx)=>facilities.push({id:'fac_dp'+n, name:'Degas Pump PU '+n, functionId:'fn_rsd', locationId: locations[idx % locations.length].id}));
+  facilities.push({id:'fac_ct301', name:'Collector Tank PU 301', functionId:'fn_rsd', locationId: locations[0].id});
+  [['Fire Extinguisher Station A'],['Emergency Assembly Point 1'],['Safety Shower Station 1']].forEach((f,idx)=>facilities.push({id:'fac_hsse'+idx, name:f[0], functionId:'fn_hsse', locationId: locations[idx % locations.length].id}));
+  DatabaseService.set('facilities', facilities);
+
+  const freqs = ['Weekly','Monthly','Every 3 Months','Every 6 Months','Yearly'];
+  function addDays(base, n){ return addDaysISO(typeof base==='string' ? base : isoDate(base), n); }
+  const todayD = new Date();
+  const todayStr = isoDate(todayD);
+
+  const forms = facilities.map((f,idx)=>{
+    const isCancelled = idx % 9 === 8; // sprinkle a few cancelled demo entries
+    return {
+      id:'sf_'+f.id,
+      sfNumber: 'SF-' + f.id.replace('fac_','').toUpperCase() + '-001',
+      sfTitle:'Inspeksi Rutin - '+f.name,
+      description:'',
+      facilityId:f.id,
+      functionId:f.functionId,
+      locationId:f.locationId,
+      frequency: freqs[idx % freqs.length],
+      responsiblePerson: idx % 2===0 ? 'Ozzy Refandi' : 'Budi Santoso',
+      status: isCancelled ? 'CANCELLED' : 'NOT_STARTED',
+      templateFile: idx % 3 !== 0 ? {name:'Template-Demo.xlsx', type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', size:0, dataUrl:null, demo:true} : null,
+      lastFilledDate: null,
+      nextDueDate: todayStr,
+      createdDate: todayStr,
+      updatedDate: todayStr
+    };
+  });
+  DatabaseService.set('standardForms', forms);
+
+  // Seed a realistic first schedule per active SF, spread across every status bucket so the
+  // dashboard and Overdue Command Panel have meaningful demo data on first load.
+  const schedules = [];
+  let bucket = 0;
+  forms.forEach(f=>{
+    if(f.status==='CANCELLED') return;
+    const b = bucket % 5; bucket++;
+    let dueDate, completedDate = null;
+    if(b===0) dueDate = addDays(todayD, -(3 + (bucket % 7)));        // OVERDUE
+    else if(b===1) dueDate = todayStr;                                // DUE TODAY
+    else if(b===2) dueDate = addDays(todayD, 1 + (bucket % 3));       // DUE SOON (within warning window)
+    else if(b===3) dueDate = addDays(todayD, 10 + (bucket % 20));     // NOT STARTED (future)
+    else { dueDate = addDays(todayD, -40); completedDate = addDays(todayD, -40); } // COMPLETED history -> next cycle auto-cascades on boot
+    schedules.push({
+      id:'sch_'+f.id, sfId:f.id, locationId:f.locationId, functionId:f.functionId, facilityId:f.facilityId,
+      scheduledDate: addDays(dueDate, -1), dueDate: dueDate, completedDate: completedDate,
+      status: completedDate ? 'COMPLETED' : 'NOT_STARTED',
+      responsiblePerson: f.responsiblePerson, submissionId: completedDate ? DatabaseService.uid('sub') : null,
+      generatedAt: new Date().toISOString()
+    });
+  });
+  DatabaseService.set('schedules', schedules);
+  DatabaseService.set('submissions', []);
+  DatabaseService.set('documents', []);
+
+  DatabaseService.set('notifications', [
+    {id:'n1', text:'3 Standard Form akan jatuh tempo hari ini di Main Location.', type:'warning', time:'Baru saja'},
+    {id:'n2', text:'Form Inspeksi KNA 05 telah diselesaikan oleh Supervisor.', type:'success', time:'2 jam lalu'},
+    {id:'n3', text:'Form Hydrant Pump PU 341 melewati batas waktu (OVERDUE).', type:'danger', time:'1 hari lalu'}
+  ]);
+
+  AuditService.log({action:'SYSTEM_SEED', object:'System', objectId:'-', user:'system', role:'System', remarks:'Demo data initialized'});
+
+  DatabaseService.markSeeded();
+}
+
+/* ============ AuthService ============ */
+const AuthService = (function(){
+  const SESSION_KEY = 'sftrack_session';
+  function login(username, password){
+    const users = DatabaseService.get('users');
+    const found = users.find(u=>u.username===username && u.password===password);
+    if(found){
+      try{ localStorage.setItem(SESSION_KEY, JSON.stringify({userId:found.id, ts:Date.now()})); }catch(e){}
+      AuditService.log({action:'LOGIN', object:'User', objectId:found.id, user:found.username, role:found.role, remarks:'User logged in'});
+      return found;
+    }
+    return null;
+  }
+  function logout(){
+    const u = currentUser();
+    if(u) AuditService.log({action:'LOGOUT', object:'User', objectId:u.id, user:u.username, role:u.role, remarks:'User logged out'});
+    try{ localStorage.removeItem(SESSION_KEY); }catch(e){}
+    location.reload();
+  }
+  function currentUser(){
+    try{
+      const raw = localStorage.getItem(SESSION_KEY);
+      if(!raw) return null;
+      const sess = JSON.parse(raw);
+      const users = DatabaseService.get('users');
+      return users.find(u=>u.id===sess.userId) || null;
+    }catch(e){ return null; }
+  }
+  /* Centralized role-based permissions. Enforced inside services/handlers (not only by hiding buttons). */
+  const PERMISSIONS = {
+    Admin: ['VIEW_SF','VIEW_NOTIFICATIONS','VIEW_REPORTS','VIEW_AUDIT_TRAIL','VIEW_MASTER_DATA','CREATE_MASTER_DATA','EDIT_MASTER_DATA','DEACTIVATE_MASTER_DATA','DELETE_MASTER_DATA','CREATE_USER','EDIT_USER','DELETE_USER','CREATE_SF','EDIT_SF','DELETE_SF','DUPLICATE_SF','COMPLETE_SF','UPLOAD_TEMPLATE','UPLOAD_COMPLETED_FILE','MANAGE_SETTINGS'],
+    Supervisor: ['VIEW_SF','VIEW_NOTIFICATIONS','VIEW_REPORTS','REVIEW_SUBMISSION','APPROVE','REJECT']
+  };
+  function can(action){ const u = currentUser(); return !!u && (PERMISSIONS[u.role]||[]).indexOf(action) > -1; }
+  function deny(action){
+    const u = currentUser();
+    AuditService.log({action:'PERMISSION_DENIED', object:'Permission', objectId:action, remarks:'Aksi ditolak untuk role '+(u?u.role:'tanpa sesi')});
+    UIService.showToast('Akses ditolak: role Anda tidak memiliki izin untuk aksi ini.');
+  }
+  /** Returns true if allowed; otherwise logs + shows a message and returns false. */
+  function guard(action){ if(can(action)) return true; deny(action); return false; }
+  return { login, logout, currentUser, can, guard, deny, PERMISSIONS };
+})();
+
+/* ============ MetricsService (single source of truth for Dashboard + Management Summary) ============ */
+const MetricsService = (function(){
+  function compute(locationId){
+    const all = !locationId || locationId==='all';
+    const today = ScheduleService.todayStr();
+    const forms = DatabaseService.get('standardForms').filter(f=>f.status!=='CANCELLED' && (all || f.locationId===locationId));
+    const ids = new Set(forms.map(f=>f.id));
+    const schedules = ScheduleService.activeSchedules().filter(s=>ids.has(s.sfId));
+    const open = schedules.filter(s=>!s.completedDate);
+    const st = s => ScheduleService.updateScheduleStatus(s);
+    const overdue = open.filter(s=>st(s)==='OVERDUE').length;
+    const dueToday = open.filter(s=>st(s)==='DUE_TODAY').length;
+    const dueSoon = open.filter(s=>st(s)==='DUE_SOON').length;
+    const completedThisYear = schedules.filter(s=>s.completedDate && String(s.dueDate).slice(0,4)===today.slice(0,4)).length;
+    const due = schedules.filter(s=>s.dueDate <= today);
+    const completedDue = due.filter(s=>s.completedDate).length;
+    const compliancePct = due.length ? Math.round(completedDue/due.length*100) : 100;
+    const missingDocuments = forms.filter(f=>!f.templateFile).length;
+    const n = forms.length;
+    const docs = DatabaseService.get('documents').filter(d=>ids.has(d.sfId));
+    const logged = new Set(DatabaseService.get('auditLogs').filter(l=>l.object==='StandardForm').map(l=>l.objectId));
+    const components = [
+      ['Document Completeness', n ? forms.filter(f=>f.templateFile).length/n : 1],
+      ['Schedule Compliance', due.length ? completedDue/due.length : 1],
+      ['Overdue Exposure (inverse)', n ? 1 - Math.min(1, overdue/n) : 1],
+      ['Submission Completeness', docs.length ? docs.filter(d=>d.status==='APPROVED').length/docs.length : 1],
+      ['Audit Trail Completeness', n ? forms.filter(f=>logged.has(f.id)).length/n : 1]
+    ];
+    const readiness = Math.round(components.reduce((s,x)=>s+x[1],0)/components.length*100);
+    return { totalActive:n, totalLocations:DatabaseService.get('locations').length, totalFacilities:DatabaseService.get('facilities').length,
+      overdue, dueToday, dueSoon, completedThisYear, compliancePct, missingDocuments, readiness, readinessComponents:components };
+  }
+  return { compute };
+})();
+
+/* ============ UIService ============ */
+const UIService = (function(){
+  let currentLocationId = 'all';
+  let currentPage = 'dashboard';
+  let detailSFId = null;
+
+  function showToast(msg){
+    const wrap = document.getElementById('toastWrap');
+    const el = document.createElement('div');
+    el.className='toast'; el.innerHTML = '<i class="fa-solid fa-circle-info" style="color:var(--yellow); margin-right:6px;"></i>' + msg;
+    wrap.appendChild(el);
+    setTimeout(()=>el.remove(), 3500);
+  }
+
+  /* Per-browser UI preferences (not business settings, so no role restriction / audit): key sftrack_ui */
+  const UI_KEY = 'sftrack_ui';
+  function uiPrefs(){ try{ return JSON.parse(localStorage.getItem(UI_KEY)) || {}; }catch(e){ return {}; } }
+  function saveUiPref(k, v){ const p = uiPrefs(); p[k] = v; try{ localStorage.setItem(UI_KEY, JSON.stringify(p)); }catch(e){} }
+  function isMobile(){ return window.innerWidth <= 768; }
+  function applySidebarPref(){ document.getElementById('app').classList.toggle('sidebar-collapsed', !!uiPrefs().sidebarCollapsed); }
+  /** Mobile: slide-in drawer. Desktop/tablet: hide/unhide the sidebar and remember the choice. */
+  function toggleSidebar(){
+    if(isMobile()){
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('scrim').classList.toggle('open');
+      return;
+    }
+    const app = document.getElementById('app');
+    const collapsed = !app.classList.contains('sidebar-collapsed');
+    app.classList.toggle('sidebar-collapsed', collapsed);
+    saveUiPref('sidebarCollapsed', collapsed);
+  }
+  /** Quick dark/light switch for everyone (display preference only). */
+  function toggleTheme(){
+    SettingsService.set('theme', SettingsService.get('theme')==='light' ? 'dark' : 'light');
+    if(currentPage==='dashboard' || currentPage==='settings') refresh(); // charts + settings form pick up the new colours
+  }
+  function closeSidebar(){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('scrim').classList.remove('open');
+  }
+
+  function togglePanel(id){
+    ['notifPanel','profilePanel'].forEach(p=>{
+      const el = document.getElementById(p);
+      if(p===id) el.classList.toggle('open'); else el.classList.remove('open');
+    });
+  }
+
+  function populateLocationSelect(){
+    const sel = document.getElementById('locationSelect');
+    const locs = DatabaseService.get('locations');
+    sel.innerHTML = '<option value="all">Semua Lokasi</option>' + locs.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+    sel.value = currentLocationId;
+  }
+  function onLocationChange(){
+    currentLocationId = document.getElementById('locationSelect').value;
+    renderPage(currentPage);
+  }
+
+  function renderNotifications(){
+    const notifs = NotificationService.all().filter(n => SettingsService.get('notifTypesEnabled')[n.type] !== false);
+    document.getElementById('notifCount').textContent = notifs.filter(n=>!n.readStatus).length;
+    const iconMap = {
+      OVERDUE:['fa-triangle-exclamation','var(--red)'], DUE_TODAY:['fa-calendar-day','var(--yellow)'],
+      DUE_SOON:['fa-hourglass-half','var(--blue)'], MISSING_DOCUMENT:['fa-file-circle-xmark','var(--orange)'],
+      NEW_SUBMISSION:['fa-upload','var(--blue)'], SUPERVISOR_REVIEW_REQUIRED:['fa-user-check','var(--yellow)'],
+      CANCELLED_SUBMISSION:['fa-ban','var(--red)']
+    };
+    const head = `<div class="dp-head" style="display:flex; align-items:center; justify-content:space-between;">
+      <span>Notifikasi (${notifs.length})</span>
+      ${notifs.length ? '<span style="color:var(--yellow); cursor:pointer; font-weight:700;" onclick="UIService.markAllNotifRead()">Mark All Read</span>' : ''}
+    </div>`;
+    const body = notifs.map(n=>{
+      const ic = iconMap[n.type] || ['fa-bell','var(--yellow)'];
+      return `<div class="notif-item" style="${n.readStatus?'opacity:.5;':''} cursor:pointer;" onclick="UIService.markNotifRead('${n.id}')">
+        <i class="fa-solid ${ic[0]}" style="color:${ic[1]}"></i>
+        <div><div class="n-text"><strong>${n.title}</strong><br>${String(n.message).replace(/\{\{date:(\d{4}-\d{2}-\d{2})\}\}/g, (m0,d0)=>formatDate(d0))}</div><div class="n-time">${formatDateTime(n.createdDate)}</div></div>
+      </div>`;
+    }).join('') || '<div style="padding:16px; font-size:12.5px; color:var(--muted);">Tidak ada notifikasi.</div>';
+    document.getElementById('notifPanel').innerHTML = head + body;
+  }
+  function markNotifRead(id){ NotificationService.markRead(id); renderNotifications(); }
+  function markAllNotifRead(){ NotificationService.markAllRead(); renderNotifications(); }
+
+  function renderProfile(){
+    const u = AuthService.currentUser();
+    if(!u) return;
+    document.getElementById('avatarInitials').textContent = u.initials;
+    document.getElementById('profileName').textContent = u.name;
+    document.getElementById('profileRole').textContent = u.role;
+    document.getElementById('profilePanelHead').textContent = u.name + ' — ' + u.role;
+    applyRoleNav();
+  }
+
+  function filteredForms(){
+    let forms = DatabaseService.get('standardForms');
+    if(currentLocationId !== 'all') forms = forms.filter(f=>f.locationId===currentLocationId);
+    return forms;
+  }
+
+  function statusCount(forms, status){ return forms.filter(f=>f.status===status).length; }
+
+  function navigate(page){
+    ScheduleService.runScheduler();
+    renderNotifications();
+    currentPage = page;
+    const activeKey = (page==='sfdetail') ? 'standardforms' : page;
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===activeKey));
+    closeSidebar();
+    renderPage(page);
+  }
+  function openSFDetail(sfId){ detailSFId = sfId; navigate('sfdetail'); }
+
+  function errorHTML(){
+    return `<div class="locked-page"><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i><h3>Unable to load data.</h3><p>Terjadi masalah saat menampilkan halaman ini. Silakan muat ulang halaman.</p><button class="btn btn-ghost" style="margin-top:14px;" onclick="UIService.refresh()"><i class="fa-solid fa-rotate"></i> Coba lagi</button></div>`;
+  }
+  function deniedHTML(name){
+    return `<div class="locked-page"><i class="fa-solid fa-lock" style="color:var(--red)"></i><h3>Akses Ditolak</h3><p>Role Anda tidak memiliki izin untuk membuka ${name}.</p></div>`;
+  }
+  /** Hide menu entries the current role cannot open (pages themselves also re-check permissions). */
+  function applyRoleNav(){
+    const need = { masterdata:'VIEW_MASTER_DATA', settings:'MANAGE_SETTINGS', audit:'VIEW_AUDIT_TRAIL', reports:'VIEW_REPORTS' };
+    document.querySelectorAll('.nav-item').forEach(n=>{ const a = need[n.dataset.page]; n.style.display = (a && !AuthService.can(a)) ? 'none' : ''; });
+  }
+  function renderPage(page){
+    try{ renderPageUnsafe(page); }
+    catch(e){ console.error('Render error on page '+page, e); const el = document.getElementById('pageContent'); if(el) el.innerHTML = errorHTML(); }
+  }
+  function renderPageUnsafe(page){
+    const el = document.getElementById('pageContent');
+    if(page==='dashboard'){ el.innerHTML = dashboardHTML(); DashboardCharts.renderAll(currentLocationId); return; }
+    if(page==='locations'){ el.innerHTML = locationsHTML(); return; }
+    if(page==='standardforms'){ el.innerHTML = SFPage.render(currentLocationId); return; }
+    if(page==='overdue'){ el.innerHTML = OverduePage.render(currentLocationId); return; }
+    if(page==='sfdetail'){ el.innerHTML = SFDetailPage.render(detailSFId); return; }
+    if(page==='audit'){ el.innerHTML = AuditPage.render(); return; }
+    if(page==='annual'){ el.innerHTML = AnnualActivityPage.render(); return; }
+    if(page==='schedule'){ el.innerHTML = JadwalPage.render(currentLocationId); return; }
+    if(page==='documents'){ el.innerHTML = DokumenPage.render(currentLocationId); return; }
+    if(page==='reports'){ el.innerHTML = ReportsPage.render(); return; }
+    if(page==='masterdata'){ el.innerHTML = MasterDataPage.render(); return; }
+    if(page==='settings'){ el.innerHTML = SettingsPage.render(); return; }
+    const labels = {};
+    el.innerHTML = `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">${labels[page]||page}</span></div>
+      <div class="locked-page">
+        <i class="fa-solid fa-hammer"></i>
+        <h3>${labels[page]||page} — Segera Hadir</h3>
+        <p>Modul ini akan dibangun pada fase pengembangan berikutnya.</p>
+      </div>`;
+  }
+
+  function dashboardHTML(){
+    const forms = filteredForms();
+    const m = MetricsService.compute(currentLocationId);
+    const total = m.totalActive, overdue = m.overdue, dueToday = m.dueToday, dueSoon = m.dueSoon, completed = m.completedThisYear;
+    const missingDoc = m.missingDocuments, compliancePct = m.compliancePct;
+    const readiness = { overall:m.readiness, components:m.readinessComponents };
+
+    const functions = DatabaseService.get('functions');
+    const facilities = DatabaseService.get('facilities');
+    const funcRows = functions.map(fn=>{
+      const count = facilities.filter(f=>f.functionId===fn.id && (currentLocationId==='all' || f.locationId===currentLocationId)).length;
+      return `<div class="func-row"><div class="func-name"><i class="fa-solid ${fn.icon}"></i> ${fn.name}</div><div class="func-count">${count} fasilitas</div></div>`;
+    }).join('');
+
+    const statusDefs = [
+      ['DUE_TODAY','Due Today','var(--yellow)'],
+      ['DUE_SOON','Due Soon','var(--blue)'], ['OVERDUE','Overdue','var(--red)'],
+      ['NOT_STARTED','Not Started','var(--muted-dim)'], ['CANCELLED','Cancelled','var(--orange)']
+    ];
+    const statusRows = statusDefs.map(([key,label,color])=>`<div class="s-row"><span class="s-dot" style="background:${color}"></span><span class="s-label">${label}</span><span class="s-val">${statusCount(forms,key)}</span></div>`).join('');
+    const readinessBars = readiness.components.map(([label,val])=>{
+      const pct = Math.round(val*100);
+      const color = pct>=95?'var(--green)':pct>=90?'var(--yellow)':pct>=80?'var(--orange)':'var(--red)';
+      return `<div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted); margin-bottom:4px;"><span>${label}</span><span style="color:${color}; font-weight:700;">${pct}%</span></div><div style="height:6px; background:var(--navy-700); border-radius:4px; overflow:hidden;"><div style="height:100%; width:${pct}%; background:${color};"></div></div></div>`;
+    }).join('');
+
+    const kpis = [
+      ['Total Active SF', total, 'fa-file-circle-check', 'var(--yellow)', ''],
+      ['Overdue', overdue, 'fa-triangle-exclamation', 'var(--red)', 'Perlu tindakan segera'],
+      ['Due Today', dueToday, 'fa-calendar-day', 'var(--yellow)', ''],
+      ['Due Soon', dueSoon, 'fa-hourglass-half', 'var(--blue)', ''],
+      ['Completed', completed, 'fa-circle-check', 'var(--green)', 'Siklus selesai (jatuh tempo tahun ini)'],
+      ['Compliance %', compliancePct+'%', 'fa-shield-halved', 'var(--green)', ''],
+      ['Missing Document', missingDoc, 'fa-file-circle-xmark', 'var(--orange)', ''],
+      ['Audit Readiness %', readiness.overall+'%', 'fa-clipboard-check', 'var(--yellow)', 'Metrik deskriptif, bukan penilaian personel']
+    ];
+    const kpiHTML = kpis.map(([label,val,icon,color,foot])=>`
+      <div class="kpi-card" style="--kc:${color}">
+        <div class="kpi-top"><span class="kpi-label">${label}</span><span class="kpi-icon"><i class="fa-solid ${icon}"></i></span></div>
+        <div class="kpi-value">${val}</div>
+        ${foot?`<div class="kpi-foot">${foot}</div>`:''}
+      </div>`).join('');
+
+    const locName = currentLocationId==='all' ? 'Semua Lokasi' : (DatabaseService.get('locations').find(l=>l.id===currentLocationId)||{}).name;
+
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Dashboard</span></div>
+      <div class="page-head">
+        <div><div class="page-title">Dashboard</div><div class="page-sub">Ringkasan status Standard Form &middot; ${locName}</div></div>
+      </div>
+      <div class="kpi-grid">${kpiHTML}</div>
+      <div class="panel-row">
+        <div class="panel"><h3><i class="fa-solid fa-sitemap" style="color:var(--yellow)"></i> Function &amp; Facility</h3>${funcRows}</div>
+        <div class="panel"><h3><i class="fa-solid fa-shield-halved" style="color:var(--yellow)"></i> Audit Readiness Breakdown</h3>${readinessBars}</div>
+      </div>
+      <div class="panel-row" style="margin-top:16px;">
+        <div class="panel"><h3><i class="fa-solid fa-chart-line" style="color:var(--yellow)"></i> Compliance Trend (6 Bulan)</h3><div class="chart-box"><canvas id="chartComplianceTrend"></canvas></div></div>
+        <div class="panel"><h3><i class="fa-solid fa-chart-column" style="color:var(--yellow)"></i> Monthly Completion Trend</h3><div class="chart-box"><canvas id="chartMonthlyCompletion"></canvas></div></div>
+      </div>
+      <div class="panel-row" style="margin-top:16px;">
+        <div class="panel"><h3><i class="fa-solid fa-location-dot" style="color:var(--yellow)"></i> Location Comparison</h3><div class="chart-box"><canvas id="chartLocationComparison"></canvas></div></div>
+        <div class="panel"><h3><i class="fa-solid fa-sitemap" style="color:var(--yellow)"></i> Function Analysis</h3><div class="chart-box"><canvas id="chartFunctionAnalysis"></canvas></div></div>
+      </div>
+      <div class="panel-row" style="margin-top:16px;">
+        <div class="panel status-list"><h3><i class="fa-solid fa-chart-pie" style="color:var(--yellow)"></i> Status Distribution <span style="font-size:10.5px; color:var(--muted-dim); font-weight:500;">(siklus aktif per SF)</span></h3>
+          <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;"><div class="chart-box" style="width:180px; height:180px; flex:0 0 auto;"><canvas id="chartStatusDistribution"></canvas></div><div style="flex:1; min-width:160px;">${statusRows}</div></div>
+        </div>
+        <div class="panel"><h3><i class="fa-solid fa-table-cells" style="color:var(--yellow)"></i> Compliance Heatmap</h3><div id="complianceHeatmap"></div></div>
+      </div>`;
+  }
+
+  function locationsHTML(){
+    const locs = DatabaseService.get('locations');
+    const functions = DatabaseService.get('functions');
+    const facilities = DatabaseService.get('facilities');
+    const cards = locs.map(l=>{
+      const facCount = facilities.filter(f=>f.locationId===l.id).length;
+      const funcRows = functions.map(fn=>{
+        const c = facilities.filter(f=>f.locationId===l.id && f.functionId===fn.id).length;
+        return `<div class="func-row"><div class="func-name"><i class="fa-solid ${fn.icon}"></i> ${fn.name}</div><div class="func-count">${c}</div></div>`;
+      }).join('');
+      return `<div class="panel" style="margin-bottom:14px;"><h3><i class="fa-solid fa-location-dot" style="color:var(--yellow)"></i> ${l.name} <span class="func-count" style="margin-left:8px;">${facCount} fasilitas</span></h3>${funcRows}</div>`;
+    }).join('');
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Lokasi &amp; Fasilitas</span></div>
+      <div class="page-head"><div><div class="page-title">Lokasi &amp; Fasilitas</div><div class="page-sub">Hierarki Location &rarr; Function &rarr; Facility</div></div></div>
+      ${cards}`;
+  }
+
+  function boot(){
+    populateLocationSelect();
+    renderNotifications();
+    renderProfile();
+    applySidebarPref();
+    navigate(SettingsService.get('defaultDashboard') || 'dashboard');
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.profile-wrap') && !e.target.closest('#profilePanel')) document.getElementById('profilePanel').classList.remove('open');
+      if(!e.target.closest('[onclick*="notifPanel"]') && !e.target.closest('#notifPanel')) document.getElementById('notifPanel').classList.remove('open');
+      if(!e.target.closest('.search-wrap')) document.getElementById('globalSearchPanel').classList.remove('open');
+    });
+    document.getElementById('scrim').addEventListener('click', closeSidebar);
+  }
+
+  function refresh(){ renderPage(currentPage); }
+  function getLocationId(){ return currentLocationId; }
+
+  return { navigate, toggleSidebar, togglePanel, onLocationChange, boot, showToast, refresh, getLocationId, markNotifRead, markAllNotifRead, openSFDetail, deniedHTML, toggleTheme };
+})();
+
+/* ============ SFPage (Standard Form Management UI) ============ */
+const SFPage = (function(){
+  let filters = { search:'', functionId:'all', status:'all', sortBy:'sfNumber' };
+  let pendingTemplateFile = null; // holds uploaded file object during add/edit before save
+  let editingId = null;
+
+  const STATUS_META = {
+    COMPLETED:['Completed','var(--green)'], DUE_TODAY:['Due Today','var(--yellow)'],
+    DUE_SOON:['Due Soon','var(--blue)'], OVERDUE:['Overdue','var(--red)'],
+    NOT_STARTED:['Not Started','var(--muted-dim)'], CANCELLED:['Cancelled','var(--orange)']
+  };
+  function statusPill(status){ const m = STATUS_META[status] || ['-','var(--muted)']; return `<span class="pill" style="background:color-mix(in srgb, ${m[1]} 18%, transparent); color:${m[1]}">${m[0]}</span>`; }
+
+  function setFilter(key, val){ filters[key] = val; UIService.refresh(); }
+
+  function render(currentLocationId){
+    const funcs = DatabaseService.get('functions');
+    const forms = SFService.list({ locationId: currentLocationId, functionId: filters.functionId, status: filters.status, search: filters.search, sortBy: filters.sortBy });
+    const rows = forms.map(f=>`
+      <tr>
+        <td style="font-weight:700; color:var(--yellow);">${f.sfNumber}</td>
+        <td>${f.sfTitle}</td>
+        <td>${refName('locations', f.locationId)}</td>
+        <td>${refName('functions', f.functionId)}</td>
+        <td>${refName('facilities', f.facilityId)}</td>
+        <td>${f.frequency}</td>
+        <td>${f.responsiblePerson||'-'}</td>
+        <td>${statusPill(f.status)}</td>
+        <td>${formatDate(f.nextDueDate)}</td>
+        <td>${f.templateFile ? '<i class="fa-solid fa-file-circle-check" style="color:var(--green)"></i>' : '<i class="fa-solid fa-file-circle-xmark" style="color:var(--muted-dim)"></i>'}</td>
+        <td><div class="row-actions">
+          <span class="icon-sm" title="View Detail" onclick="UIService.openSFDetail('${f.id}')"><i class="fa-solid fa-eye"></i></span>
+          ${AuthService.can('EDIT_SF') ? `<span class="icon-sm" title="Edit" onclick="SFPage.edit('${f.id}')"><i class="fa-solid fa-pen"></i></span>` : ''}
+          ${AuthService.can('COMPLETE_SF') ? `<span class="icon-sm" title="Complete Current Cycle" onclick="SFPage.completeActive('${f.id}')"><i class="fa-solid fa-check" style="color:var(--green)"></i></span>` : ''}
+          ${AuthService.can('DUPLICATE_SF') ? `<span class="icon-sm" title="Duplicate" onclick="SFPage.duplicateSF('${f.id}')"><i class="fa-solid fa-copy"></i></span>` : ''}
+          <span class="icon-sm" title="Download Template" onclick="SFPage.downloadTemplate('${f.id}')"><i class="fa-solid fa-download"></i></span>
+          ${AuthService.can('DELETE_SF') ? `<span class="icon-sm" title="Delete" onclick="SFPage.deleteConfirm('${f.id}')"><i class="fa-solid fa-trash" style="color:var(--red)"></i></span>` : ''}
+        </div></td>
+      </tr>`).join('');
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Standard Forms</span></div>
+      <div class="page-head">
+        <div><div class="page-title">Standard Forms</div><div class="page-sub">${forms.length} form &middot; ${currentLocationId==='all'?'Semua Lokasi':refName('locations',currentLocationId)}</div></div>
+        ${AuthService.can('CREATE_SF') ? '<button class="btn btn-primary" onclick="SFPage.openAdd()"><i class="fa-solid fa-plus"></i> Tambah Standard Form</button>' : ''}
+      </div>
+      <div class="toolbar">
+        <div class="tb-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Cari nomor, judul, PIC..." value="${filters.search}" oninput="SFPage.setFilter('search', this.value)"></div>
+        <select onchange="SFPage.setFilter('functionId', this.value)">
+          <option value="all">Semua Fungsi</option>
+          ${funcs.map(fn=>`<option value="${fn.id}" ${filters.functionId===fn.id?'selected':''}>${fn.name}</option>`).join('')}
+        </select>
+        <select onchange="SFPage.setFilter('status', this.value)">
+          <option value="all">Semua Status</option>
+          ${Object.keys(STATUS_META).map(s=>`<option value="${s}" ${filters.status===s?'selected':''}>${STATUS_META[s][0]}</option>`).join('')}
+        </select>
+      </div>
+      <div class="sf-table-wrap">
+        ${forms.length ? `<table class="sf-table"><thead><tr>
+          <th onclick="SFPage.setFilter('sortBy','sfNumber')">SF Number</th>
+          <th onclick="SFPage.setFilter('sortBy','sfTitle')">Title</th>
+          <th>Location</th><th>Function</th><th>Facility</th>
+          <th onclick="SFPage.setFilter('sortBy','frequency')">Frequency</th>
+          <th>PIC</th>
+          <th onclick="SFPage.setFilter('sortBy','status')">Status</th>
+          <th onclick="SFPage.setFilter('sortBy','nextDueDate')">Next Due</th>
+          <th>Template</th><th>Aksi</th>
+        </tr></thead><tbody>${rows}</tbody></table>`
+        : `<div class="empty-state"><i class="fa-solid fa-inbox"></i><div>No Standard Forms found. Tidak ada Standard Form yang cocok dengan filter.</div></div>`}
+      </div>`;
+  }
+
+  function closeModal(){ document.getElementById('sfModalScrim').classList.remove('open'); pendingTemplateFile = null; editingId = null; }
+
+  function facilityOptions(locationId, functionId, selectedId){
+    const facs = DatabaseService.get('facilities').filter(f => (!locationId||locationId==='all'||f.locationId===locationId) && (!functionId||functionId==='all'||f.functionId===functionId) && (MasterData.isActive(f) || f.id===selectedId));
+    return facs.map(f=>`<option value="${f.id}" ${f.id===selectedId?'selected':''}>${f.name}${MasterData.isActive(f)?'':' (nonaktif)'}</option>`).join('') || '<option value="">Tidak ada fasilitas untuk kombinasi ini</option>';
+  }
+
+  function openAdd(){
+    if(!AuthService.guard('CREATE_SF')) return;
+    editingId = null; pendingTemplateFile = null;
+    const locs = MasterData.activeList('locations'), funcs = MasterData.activeList('functions');
+    if(!locs.length || !funcs.length){ UIService.showToast('Belum ada Location/Function aktif. Tambah atau aktifkan di Master Data.'); return; }
+    document.getElementById('sfModalBox').innerHTML = formModalHTML({
+      title:'Tambah Standard Form', submitLabel:'Simpan', locs, funcs, sf:{ frequency:'Monthly', responsiblePerson:'', locationId:locs[0].id, functionId:funcs[0].id }
+    });
+    document.getElementById('sfModalScrim').classList.add('open');
+  }
+
+  function edit(id){
+    if(!AuthService.guard('EDIT_SF')) return;
+    const sf = SFService.get(id); if(!sf) return;
+    editingId = id; pendingTemplateFile = sf.templateFile;
+    const locs = MasterData.activeList('locations', sf.locationId), funcs = MasterData.activeList('functions', sf.functionId);
+    document.getElementById('sfModalBox').innerHTML = formModalHTML({ title:'Edit Standard Form', submitLabel:'Simpan Perubahan', locs, funcs, sf });
+    document.getElementById('sfModalScrim').classList.add('open');
+  }
+
+  function formModalHTML(ctx){
+    const sf = ctx.sf;
+    return `
+      <div class="modal-head"><h3>${ctx.title}</h3><button class="modal-close" onclick="SFPage.closeModal()"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="modal-body">
+        <div class="step-block">
+          <div class="step-label">Step 1-3 &middot; Lokasi, Fungsi &amp; Fasilitas</div>
+          <div class="form-grid">
+            <div><label>Location</label><select id="f_location" onchange="SFPage.onLocFuncChange()">${ctx.locs.map(l=>`<option value="${l.id}" ${l.id===sf.locationId?'selected':''}>${l.name}</option>`).join('')}</select></div>
+            <div><label>Function</label><select id="f_function" onchange="SFPage.onLocFuncChange()">${ctx.funcs.map(fn=>`<option value="${fn.id}" ${fn.id===sf.functionId?'selected':''}>${fn.name}</option>`).join('')}</select></div>
+            <div class="full"><label>Facility</label><select id="f_facility">${facilityOptions(sf.locationId, sf.functionId, sf.facilityId)}</select></div>
+          </div>
+        </div>
+        <div class="step-block">
+          <div class="step-label">Step 4 &middot; Informasi Standard Form</div>
+          <div class="form-grid">
+            <div><label>SF Number</label><input id="f_sfnumber" value="${sf.sfNumber||''}" placeholder="Auto jika kosong"></div>
+            <div><label>Responsible Person</label><select id="f_pic">${MasterData.responsibleOptions(sf.responsiblePerson)}</select></div>
+            <div class="full"><label>SF Title</label><input id="f_title" value="${sf.sfTitle||''}" placeholder="Judul Standard Form"></div>
+            <div class="full"><label>Description</label><textarea id="f_desc" rows="2" placeholder="Deskripsi singkat">${sf.description||''}</textarea></div>
+            <div><label>Status</label><select id="f_status">${Object.keys(STATUS_META).map(s=>`<option value="${s}" ${s===sf.status?'selected':''}>${STATUS_META[s][0]}</option>`).join('')}</select></div>
+            <div><label>Last Filled Date</label><input type="date" id="f_lastfilled" value="${sf.lastFilledDate||''}"></div>
+          </div>
+        </div>
+        <div class="step-block">
+          <div class="step-label">Step 5 &middot; Frequency</div>
+          <div class="form-grid"><div class="full"><select id="f_frequency">
+            ${['Weekly','Monthly','Every 3 Months','Every 6 Months','Yearly'].map(fr=>`<option value="${fr}" ${fr===sf.frequency?'selected':''}>${fr}</option>`).join('')}
+          </select></div></div>
+        </div>
+        <div class="step-block">
+          <div class="step-label">Step 6 &middot; Template File (Excel / DOCX)</div>
+          <div id="templateArea">${templateAreaHTML()}</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="SFPage.closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="SFPage.save()"><i class="fa-solid fa-floppy-disk"></i> Step 7 &middot; ${ctx.submitLabel}</button>
+      </div>`;
+  }
+
+  function templateAreaHTML(){
+    if(pendingTemplateFile){
+      return `<div class="file-chip"><i class="fa-solid fa-file-lines"></i> ${pendingTemplateFile.name} <span class="fc-remove" onclick="SFPage.removeTemplate()"><i class="fa-solid fa-xmark"></i></span></div>`;
+    }
+    return `<div class="file-drop" onclick="SFPage.triggerTemplateUpload()"><i class="fa-solid fa-cloud-arrow-up"></i>Klik untuk upload template (.xlsx, .xls, .docx, .doc) &middot; maks 4MB</div>`;
+  }
+
+  function onLocFuncChange(){
+    const loc = document.getElementById('f_location').value;
+    const fn = document.getElementById('f_function').value;
+    document.getElementById('f_facility').innerHTML = facilityOptions(loc, fn, null);
+  }
+
+  function removeTemplate(){ pendingTemplateFile = null; document.getElementById('templateArea').innerHTML = templateAreaHTML(); }
+
+  function triggerTemplateUpload(){
+    if(!AuthService.guard('UPLOAD_TEMPLATE')) return;
+    const input = document.getElementById('hiddenFileInput');
+    input.setAttribute('accept', '.xlsx,.xls,.docx,.doc');
+    input.dataset.mode = 'template';
+    input.click();
+  }
+
+  document.getElementById('hiddenFileInput').addEventListener('change', async function(e){
+    const file = e.target.files[0]; if(!file) return;
+    const mode = e.target.dataset.mode || 'template';
+    if(mode === 'completed'){
+      try{
+        const saved = await DocumentService.uploadCompleted(pendingUploadSfId, file);
+        if(saved){ UIService.showToast('Dokumen terisi berhasil diupload, menunggu review Supervisor.'); UIService.refresh(); }
+      }catch(err){ UIService.showToast(err.message || 'Gagal upload file.'); }
+    } else {
+      try{
+        if(!AuthService.guard('UPLOAD_TEMPLATE')){ e.target.value=''; return; }
+        pendingTemplateFile = await FileService.upload(file);
+        document.getElementById('templateArea').innerHTML = templateAreaHTML();
+        UIService.showToast('Template berhasil dipilih: ' + file.name);
+      }catch(err){ UIService.showToast(err.message || 'Gagal upload file.'); }
+    }
+    e.target.value = '';
+  });
+
+  function save(){
+    const facility = document.getElementById('f_facility').value;
+    if(!facility){ UIService.showToast('Pilih fasilitas terlebih dahulu.'); return; }
+    const title = document.getElementById('f_title').value.trim();
+    if(!title){ UIService.showToast('SF Title wajib diisi.'); return; }
+    const data = {
+      locationId: document.getElementById('f_location').value,
+      functionId: document.getElementById('f_function').value,
+      facilityId: facility,
+      sfNumber: document.getElementById('f_sfnumber').value.trim() || SFService.nextSfNumber(facility),
+      sfTitle: title,
+      description: document.getElementById('f_desc').value.trim(),
+      responsiblePerson: document.getElementById('f_pic').value.trim(),
+      status: document.getElementById('f_status').value,
+      frequency: document.getElementById('f_frequency').value,
+      lastFilledDate: document.getElementById('f_lastfilled').value || null,
+      templateFile: pendingTemplateFile
+    };
+    if(!data.responsiblePerson){ UIService.showToast('Pilih Responsible Person terlebih dahulu.'); return; }
+    if(/[<>]/.test(data.sfTitle+data.description+data.sfNumber)){ UIService.showToast('Judul, nomor, dan deskripsi tidak boleh mengandung karakter < atau >.'); return; }
+    const before = editingId ? SFService.get(editingId) : null;
+    const saved = editingId ? SFService.update(editingId, data) : SFService.create(data);
+    if(!saved) return; // permission denied or record missing (message already shown)
+    const tplChanged = data.templateFile && !data.templateFile.demo && (!before || !before.templateFile || before.templateFile.dataUrl !== data.templateFile.dataUrl);
+    if(tplChanged) AuditService.log({action:'UPLOAD_TEMPLATE', object:'StandardForm', objectId:saved.id, oldValue:(before&&before.templateFile)?before.templateFile.name:null, newValue:data.templateFile.name, remarks:'Upload template SF'});
+    UIService.showToast(editingId ? 'Standard Form berhasil diperbarui.' : 'Standard Form berhasil dibuat & jadwal otomatis dibuat.');
+    closeModal();
+    UIService.refresh();
+  }
+
+  function duplicateSF(id){ const copy = SFService.duplicate(id); if(!copy) return; UIService.showToast('Standard Form berhasil diduplikasi.'); UIService.refresh(); }
+  function completeActive(sfId){
+    if(!AuthService.guard('COMPLETE_SF')) return;
+    const chain = ScheduleService.schedulesForSF(sfId);
+    const active = chain.slice().reverse().find(s=>!s.completedDate);
+    if(!active){ UIService.showToast('Tidak ada siklus aktif untuk diselesaikan.'); return; }
+    ScheduleService.completeSchedule(active.id);
+    UIService.showToast('Siklus selesai — jadwal berikutnya otomatis dibuat.');
+    UIService.refresh();
+  }
+  function deleteConfirm(id){
+    if(!AuthService.guard('DELETE_SF')) return;
+    const sf = SFService.get(id); if(!sf) return;
+    if(confirm('Hapus Standard Form "'+sf.sfTitle+'" beserta jadwal & dokumennya? Tindakan ini tidak dapat dibatalkan.')){
+      if(SFService.remove(id)){ UIService.showToast('Standard Form dihapus.'); UIService.refresh(); }
+    }
+  }
+  function downloadTemplate(id){ const sf = SFService.get(id); if(sf) FileService.download(sf.templateFile, {object:'Template', objectId:id}); }
+
+  return { render, setFilter, openAdd, edit, duplicateSF, completeActive, deleteConfirm, downloadTemplate, closeModal, onLocFuncChange, removeTemplate, triggerTemplateUpload, save };
+})();
+
+/* ============ OverduePage (Overdue Command Panel) ============ */
+const OverduePage = (function(){
+  function sfName(sfId){ const s = DatabaseService.get('standardForms').find(x=>x.id===sfId); return s ? s.sfTitle : sfId; }
+
+  function render(currentLocationId){
+    const cfg = ScheduleService.getConfig();
+    const list = ScheduleService.getOverdueList(currentLocationId);
+    const rows = list.map(s=>{
+      const days = ScheduleService.daysBetween(s.dueDate, ScheduleService.todayStr());
+      return `<tr>
+        <td style="font-weight:700;">${sfName(s.sfId)}</td>
+        <td>${refName('locations', s.locationId)}</td>
+        <td>${refName('functions', s.functionId)}</td>
+        <td>${refName('facilities', s.facilityId)}</td>
+        <td>${formatDate(s.dueDate)}</td>
+        <td><span class="pill" style="background:color-mix(in srgb, var(--red) 18%, transparent); color:var(--red)">${days} hari</span></td>
+        <td>${s.responsiblePerson||'-'}</td>
+        <td>${AuthService.can('COMPLETE_SF')
+          ? `<button class="btn btn-primary" style="padding:6px 12px; font-size:11.5px;" onclick="OverduePage.complete('${s.id}')"><i class="fa-solid fa-check"></i> Complete</button>`
+          : `<button class="btn btn-ghost" style="padding:6px 12px; font-size:11.5px;" onclick="UIService.openSFDetail('${s.sfId}')"><i class="fa-solid fa-eye"></i> Buka SF</button>`}</td>
+      </tr>`;
+    }).join('');
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Overdue Command Panel</span></div>
+      <div class="page-head">
+        <div><div class="page-title" style="color:var(--red);"><i class="fa-solid fa-triangle-exclamation"></i> Overdue Command Panel</div><div class="page-sub">${list.length} Standard Form melewati batas waktu &middot; ${currentLocationId==='all'?'Semua Lokasi':refName('locations',currentLocationId)}</div></div>
+        <div class="field-block" style="display:flex; align-items:center; gap:8px;">
+          <label style="margin:0; white-space:nowrap;">Due Soon Warning (hari)</label>
+          <input type="number" min="1" value="${cfg.dueSoonWarningDays}" style="width:64px; padding:8px; background:var(--navy-800); border:1px solid var(--border); border-radius:7px;" ${AuthService.can('MANAGE_SETTINGS')?'':'disabled'} onchange="OverduePage.setWarning(this.value)">
+        </div>
+      </div>
+      <div class="sf-table-wrap">
+        ${list.length ? `<table class="sf-table"><thead><tr>
+          <th>SF</th><th>Location</th><th>Function</th><th>Facility</th><th>Due Date</th><th>Days Overdue</th><th>Responsible Person</th><th>Action</th>
+        </tr></thead><tbody>${rows}</tbody></table>`
+        : `<div class="empty-state"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i><div>Tidak ada Standard Form yang overdue. Semua terkendali.</div></div>`}
+      </div>`;
+  }
+
+  function complete(scheduleId){
+    if(!AuthService.guard('COMPLETE_SF')) return;
+    ScheduleService.completeSchedule(scheduleId);
+    UIService.showToast('Schedule diselesaikan — siklus berikutnya otomatis dibuat.');
+    UIService.refresh();
+  }
+  function setWarning(val){ if(!AuthService.guard('MANAGE_SETTINGS')) { UIService.refresh(); return; } SettingsService.setWarningDays(val); ScheduleService.runScheduler(); UIService.showToast('Periode peringatan Due Soon diperbarui.'); UIService.refresh(); }
+
+  return { render, complete, setWarning };
+})();
+
+/* ============ SFDetailPage (SF Detail: Document Control + History + Supervisor Review) ============ */
+const SFDetailPage = (function(){
+  const STATUS_META = {
+    COMPLETED:['Completed','var(--green)'], DUE_TODAY:['Due Today','var(--yellow)'],
+    DUE_SOON:['Due Soon','var(--blue)'], OVERDUE:['Overdue','var(--red)'],
+    NOT_STARTED:['Not Started','var(--muted-dim)'], CANCELLED:['Cancelled','var(--orange)'],
+    PENDING:['Pending Review','var(--yellow)'], APPROVED:['Approved','var(--green)']
+  };
+  function pill(status){ const m = STATUS_META[status]||['-','var(--muted)']; return `<span class="pill" style="background:color-mix(in srgb, ${m[1]} 18%, transparent); color:${m[1]}">${m[0]}</span>`; }
+
+  function render(sfId){
+    const sf = SFService.get(sfId);
+    if(!sf) return '<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><div>Standard Form tidak ditemukan.</div></div>';
+    const docs = DocumentService.forSF(sfId);
+    const latest = docs[0] || null;
+    const user = AuthService.currentUser();
+    const canReview = AuthService.can('APPROVE') && AuthService.can('REJECT');
+    const canUpload = AuthService.can('UPLOAD_COMPLETED_FILE');
+
+    let rows = [];
+    docs.forEach(d=>{
+      rows.push({date:d.uploadedAt, user:d.uploadedBy, action:'Uploaded SF', file:d.name, status:d.status==='PENDING'?'PENDING':d.status, remarks:d.remark||'-'});
+      if(d.reviewedAt) rows.push({date:d.reviewedAt, user:d.reviewedBy, action: d.status==='APPROVED'?'Approved':'Rejected/Cancelled', file:d.name, status:d.status, remarks: d.status==='CANCELLED'?(d.cancellationReason||'-'):(d.remark||'-')});
+    });
+    rows.sort((a,b)=> a.date < b.date ? 1 : -1);
+    const historyHTML = rows.length ? rows.map(r=>`<tr><td>${formatDateTime(r.date)}</td><td>${r.user}</td><td>${r.action}</td><td>${r.file}</td><td>${pill(r.status)}</td><td>${r.remarks}</td></tr>`).join('')
+      : '<tr><td colspan="6" style="text-align:center; color:var(--muted);">Belum ada riwayat dokumen.</td></tr>';
+
+    const templateBlock = sf.templateFile
+      ? `<div class="file-chip" style="margin-top:0;"><i class="fa-solid fa-file-lines"></i> ${sf.templateFile.name}<button class="btn btn-ghost" style="margin-left:auto; padding:5px 10px; font-size:11px;" onclick='FileService.download(SFService.get("${sfId}").templateFile, {object:"Template", objectId:"${sfId}"})'><i class="fa-solid fa-download"></i> Download</button></div>`
+      : `<div class="empty-state" style="padding:16px;"><i class="fa-solid fa-file-circle-xmark"></i><div>Belum ada template.</div></div>`;
+
+    const latestBlock = latest
+      ? `<div class="file-chip" style="margin-top:0;">
+          <i class="fa-solid fa-file-circle-check"></i> ${latest.name} ${pill(latest.status)}
+          <div style="margin-left:auto; display:flex; gap:6px;">
+            <button class="btn btn-ghost" style="padding:5px 10px; font-size:11px;" onclick="SFDetailPage.viewDoc('${latest.id}')"><i class="fa-solid fa-eye"></i> View</button>
+            <button class="btn btn-ghost" style="padding:5px 10px; font-size:11px;" onclick='FileService.download(DocumentService.get("${latest.id}"), {object:"Document", objectId:"${latest.id}"})'><i class="fa-solid fa-download"></i> Download</button>
+          </div>
+        </div>
+        ${latest.status==='PENDING' && canReview ? `<div style="display:flex; gap:8px; margin-top:10px;">
+          <button class="btn btn-primary" onclick="SFDetailPage.approve('${latest.id}')"><i class="fa-solid fa-check"></i> Approve</button>
+          <button class="btn btn-ghost" style="border-color:var(--red); color:var(--red);" onclick="SFDetailPage.openReject('${latest.id}')"><i class="fa-solid fa-xmark"></i> Reject / Cancel</button>
+        </div>` : ''}
+        ${latest.status==='PENDING' && !canReview ? `<div class="kpi-foot" style="margin-top:8px;">Menunggu review Supervisor.</div>` : ''}`
+      : `<div class="empty-state" style="padding:16px;"><i class="fa-solid fa-inbox"></i><div>Belum ada dokumen terisi.</div></div>`;
+
+    return `
+      <div class="breadcrumb"><span onclick="UIService.navigate('standardforms')" style="cursor:pointer;">Standard Forms</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">${sf.sfTitle}</span></div>
+      <div class="page-head">
+        <div><div class="page-title">${sf.sfTitle}</div><div class="page-sub">${sf.sfNumber}</div></div>
+        <button class="btn btn-ghost" onclick="UIService.navigate('standardforms')"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+      </div>
+      <div class="panel-row" style="margin-bottom:16px;">
+        <div class="panel">
+          <h3><i class="fa-solid fa-circle-info" style="color:var(--yellow)"></i> Informasi Standard Form</h3>
+          <div class="view-grid">
+            <div class="view-item"><div class="vi-label">Location</div><div class="vi-val">${refName('locations',sf.locationId)}</div></div>
+            <div class="view-item"><div class="vi-label">Function</div><div class="vi-val">${refName('functions',sf.functionId)}</div></div>
+            <div class="view-item"><div class="vi-label">Facility</div><div class="vi-val">${refName('facilities',sf.facilityId)}</div></div>
+            <div class="view-item"><div class="vi-label">Frequency</div><div class="vi-val">${sf.frequency}</div></div>
+            <div class="view-item"><div class="vi-label">Responsible Person</div><div class="vi-val">${sf.responsiblePerson||'-'}</div></div>
+            <div class="view-item"><div class="vi-label">Current Status</div><div class="vi-val">${pill(sf.status)}</div></div>
+            <div class="view-item"><div class="vi-label">Last Filled</div><div class="vi-val">${formatDate(sf.lastFilledDate)}</div></div>
+            <div class="view-item"><div class="vi-label">Next Due</div><div class="vi-val">${formatDate(sf.nextDueDate)}</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3><i class="fa-solid fa-folder-open" style="color:var(--yellow)"></i> Document Control</h3>
+          <div class="step-label" style="margin-top:0;">Original Template</div>${templateBlock}
+          <div class="step-label" style="margin-top:16px;">Latest Completed Document</div>${latestBlock}
+          ${canUpload ? `<button class="btn btn-primary btn-block" style="margin-top:14px;" onclick="SFDetailPage.triggerUpload('${sfId}')"><i class="fa-solid fa-cloud-arrow-up"></i> Upload New Completed Document</button>` : '<div class="kpi-foot" style="margin-top:12px;">Upload dokumen hanya dapat dilakukan oleh Admin.</div>'}
+        </div>
+      </div>
+      <div class="panel">
+        <h3><i class="fa-solid fa-clock-rotate-left" style="color:var(--yellow)"></i> Riwayat Dokumen (Audit History)</h3>
+        <div class="sf-table-wrap"><table class="sf-table"><thead><tr><th>Date</th><th>User</th><th>Action</th><th>File</th><th>Status</th><th>Remarks</th></tr></thead><tbody>${historyHTML}</tbody></table></div>
+      </div>`;
+  }
+
+  function triggerUpload(sfId){
+    if(!AuthService.guard('UPLOAD_COMPLETED_FILE')) return;
+    pendingUploadSfId = sfId;
+    const input = document.getElementById('hiddenFileInput');
+    input.setAttribute('accept', FileService.ACCEPTED_EXT.join(','));
+    input.dataset.mode = 'completed';
+    input.click();
+  }
+
+  function viewDoc(docId){
+    const doc = DocumentService.get(docId);
+    if(!doc) return;
+    let body;
+    if(!doc.dataUrl) body = '<div class="empty-state"><i class="fa-solid fa-eye-slash"></i><div>Preview tidak tersedia (file demo).</div></div>';
+    else if(doc.type && doc.type.startsWith('image/')) body = `<img src="${doc.dataUrl}" style="max-width:100%; border-radius:8px;">`;
+    else if(doc.type === 'application/pdf') body = `<embed src="${doc.dataUrl}" type="application/pdf" style="width:100%; height:60vh; border-radius:8px;">`;
+    else body = '<div class="empty-state"><i class="fa-solid fa-file"></i><div>Preview tidak tersedia untuk tipe file ini. Gunakan Download.</div></div>';
+    document.getElementById('sfModalBox').innerHTML = `
+      <div class="modal-head"><h3>${doc.name}</h3><button class="modal-close" onclick="SFPage.closeModal()"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="modal-body">${body}</div>
+      <div class="modal-foot"><button class="btn btn-primary" onclick='FileService.download(DocumentService.get("${docId}"), {object:"Document", objectId:"${docId}"})'><i class="fa-solid fa-download"></i> Download</button></div>`;
+    document.getElementById('sfModalScrim').classList.add('open');
+  }
+
+  function approve(docId){
+    let ok = null;
+    try{ ok = DocumentService.approve(docId); }catch(e){ UIService.showToast(e.message || 'Gagal menyetujui dokumen.'); return; }
+    if(!ok) return;
+    UIService.showToast('Dokumen disetujui — schedule diselesaikan & siklus berikutnya dibuat otomatis.');
+    UIService.refresh();
+  }
+
+  function openReject(docId){
+    if(!AuthService.guard('REJECT')) return;
+    document.getElementById('sfModalBox').innerHTML = `
+      <div class="modal-head"><h3>Reject / Cancel Submission</h3><button class="modal-close" onclick="SFPage.closeModal()"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="modal-body">
+        <div class="field-block"><label>Alasan Pembatalan (wajib diisi)</label><textarea id="rejectReason" rows="3" style="width:100%; padding:9px 11px; background:var(--navy-950); border:1px solid var(--border); border-radius:7px;" placeholder="Jelaskan alasan penolakan submission ini..."></textarea></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="SFPage.closeModal()">Batal</button>
+        <button class="btn btn-primary" style="background:linear-gradient(135deg, var(--red), #c73e3e); color:#fff;" onclick="SFDetailPage.submitReject('${docId}')"><i class="fa-solid fa-xmark"></i> Reject / Cancel</button>
+      </div>`;
+    document.getElementById('sfModalScrim').classList.add('open');
+  }
+  function submitReject(docId){
+    const reason = document.getElementById('rejectReason').value;
+    if(!reason || !reason.trim()){ UIService.showToast('Alasan pembatalan wajib diisi.'); return; }
+    try{
+      const ok = DocumentService.reject(docId, reason);
+      if(!ok){ SFPage.closeModal(); return; }
+      UIService.showToast('Submission dibatalkan (CANCELLED).');
+      SFPage.closeModal();
+      UIService.refresh();
+    }catch(e){ UIService.showToast(e.message || 'Gagal membatalkan submission.'); }
+  }
+
+  return { render, triggerUpload, viewDoc, approve, openReject, submitReject };
+})();
+
+/* ============ AuditPage (Audit Trail) ============ */
+const AuditPage = (function(){
+  let search = '';
+  function setFilter(val){ search = val; UIService.refresh(); }
+  function render(){
+    if(!AuthService.can('VIEW_AUDIT_TRAIL')) return UIService.deniedHTML('Audit Trail');
+    let logs = AuditService.all();
+    if(search){ const q = search.toLowerCase(); logs = logs.filter(l => (l.user||'').toLowerCase().includes(q) || (l.action||'').toLowerCase().includes(q) || (l.object||'').toLowerCase().includes(q) || (l.objectId||'').toLowerCase().includes(q)); }
+    const rows = logs.slice(0,300).map(l=>`
+      <tr>
+        <td>${formatDateTime(l.timestamp)}</td>
+        <td>${l.user}</td><td>${l.role}</td>
+        <td><span class="pill" style="background:rgba(244,196,48,.15); color:var(--yellow);">${l.action}</span></td>
+        <td>${l.object}</td><td>${l.objectId}</td>
+        <td style="max-width:140px; overflow:hidden; text-overflow:ellipsis;">${l.oldValue}</td>
+        <td style="max-width:140px; overflow:hidden; text-overflow:ellipsis;">${l.newValue}</td>
+        <td style="color:var(--muted-dim);">${l.ip}</td>
+        <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis;">${l.remarks||'-'}</td>
+      </tr>`).join('');
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Audit Trail</span></div>
+      <div class="page-head"><div><div class="page-title">Audit Trail</div><div class="page-sub">${logs.length} entri &middot; menampilkan maksimal 300 terbaru</div></div></div>
+      <div class="toolbar"><div class="tb-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Cari user, action, object..." value="${search}" oninput="AuditPage.setFilter(this.value)"></div></div>
+      <div class="sf-table-wrap"><table class="sf-table"><thead><tr>
+        <th>Timestamp</th><th>User</th><th>Role</th><th>Action</th><th>Object</th><th>Object ID</th><th>Old Value</th><th>New Value</th><th>IP</th><th>Remarks</th>
+      </tr></thead><tbody>${rows || '<tr><td colspan="10" style="text-align:center; color:var(--muted);">Tidak ada log.</td></tr>'}</tbody></table></div>`;
+  }
+  return { render, setFilter };
+})();
+
+/* ============ DashboardCharts (Chart.js renderers + Compliance Heatmap) ============ */
+const DashboardCharts = (function(){
+  const instances = {};
+  function destroy(id){ if(instances[id]){ instances[id].destroy(); delete instances[id]; } }
+  function monthLabel(d){ return d.toLocaleDateString('id-ID', {month:'short', year:'2-digit'}); }
+  function monthsBack(n){
+    const arr = [];
+    const now = new Date();
+    for(let i=n-1;i>=0;i--){ arr.push(new Date(now.getFullYear(), now.getMonth()-i, 1)); }
+    return arr;
+  }
+  function inMonth(dateStr, monthDate){
+    if(!dateStr) return false;
+    const d = new Date(String(dateStr).length===10 ? dateStr+'T00:00:00' : dateStr);
+    return d.getFullYear()===monthDate.getFullYear() && d.getMonth()===monthDate.getMonth();
+  }
+  let gridColor, textColor, baseOpts;
+  function cssVar(name, fallback){ const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fallback; }
+  /** Chart text/grid colours follow the active theme (re-read on every render). */
+  function applyThemeColors(){
+    gridColor = cssVar('--border', 'rgba(255,255,255,.08)');
+    textColor = cssVar('--muted', '#8b96ac');
+    baseOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:textColor, font:{size:11}}}}, scales:{ x:{ticks:{color:textColor,font:{size:10}}, grid:{color:gridColor}}, y:{ticks:{color:textColor,font:{size:10}}, grid:{color:gridColor}} } };
+  }
+  applyThemeColors();
+
+  function renderAll(locationId){
+    renderHeatmap();
+    applyThemeColors();
+    if(typeof Chart === 'undefined') return; // library failed to load; skip gracefully
+    const schedules = ScheduleService.activeSchedules().filter(s=> locationId==='all'||s.locationId===locationId);
+    const months = monthsBack(6);
+    const labels = months.map(monthLabel);
+
+    // 1. Compliance Trend
+    const complianceSeries = months.map(m=>{
+      const due = schedules.filter(s=>inMonth(s.dueDate,m));
+      return due.length ? Math.round((due.filter(s=>s.completedDate).length/due.length)*100) : null;
+    });
+    destroy('chartComplianceTrend');
+    const c1 = document.getElementById('chartComplianceTrend');
+    if(c1) instances.chartComplianceTrend = new Chart(c1, { type:'line', data:{labels, datasets:[{label:'Compliance %', data:complianceSeries, borderColor:'#2ecc71', backgroundColor:'rgba(46,204,113,.15)', tension:.3, fill:true, spanGaps:true}]}, options: Object.assign({}, baseOpts, {scales:Object.assign({},baseOpts.scales,{y:Object.assign({},baseOpts.scales.y,{min:0,max:100})})}) });
+
+    // 2. Monthly Completion Trend
+    const completionSeries = months.map(m=> schedules.filter(s=>inMonth(s.completedDate,m)).length);
+    destroy('chartMonthlyCompletion');
+    const c2 = document.getElementById('chartMonthlyCompletion');
+    if(c2) instances.chartMonthlyCompletion = new Chart(c2, { type:'bar', data:{labels, datasets:[{label:'Selesai', data:completionSeries, backgroundColor:'#f4c430', borderRadius:4}]}, options: Object.assign({}, baseOpts, {scales:Object.assign({},baseOpts.scales,{y:Object.assign({},baseOpts.scales.y,{beginAtZero:true, ticks:{color:textColor, font:{size:10}, precision:0}})})}) });
+
+    // 3. Location Comparison
+    const locs = DatabaseService.get('locations');
+    const locCompliance = locs.map(l=>{
+      const due = ScheduleService.activeSchedules().filter(s=>s.locationId===l.id && s.dueDate<=ScheduleService.todayStr());
+      return due.length ? Math.round((due.filter(s=>s.completedDate).length/due.length)*100) : 100;
+    });
+    destroy('chartLocationComparison');
+    const c3 = document.getElementById('chartLocationComparison');
+    if(c3) instances.chartLocationComparison = new Chart(c3, { type:'bar', data:{labels:locs.map(l=>l.name), datasets:[{label:'Compliance %', data:locCompliance, backgroundColor:'#4fa3ff', borderRadius:4}]}, options: Object.assign({}, baseOpts, {scales:Object.assign({},baseOpts.scales,{y:Object.assign({},baseOpts.scales.y,{min:0,max:100})})}) });
+
+    // 4. Function Analysis
+    const funcs = DatabaseService.get('functions');
+    const funcCompliance = funcs.map(fn=>{
+      const due = ScheduleService.activeSchedules().filter(s=>s.functionId===fn.id && (locationId==='all'||s.locationId===locationId) && s.dueDate<=ScheduleService.todayStr());
+      return due.length ? Math.round((due.filter(s=>s.completedDate).length/due.length)*100) : 100;
+    });
+    destroy('chartFunctionAnalysis');
+    const c4 = document.getElementById('chartFunctionAnalysis');
+    if(c4) instances.chartFunctionAnalysis = new Chart(c4, { type:'bar', data:{labels:funcs.map(f=>f.name), datasets:[{label:'Compliance %', data:funcCompliance, backgroundColor:'#ff9f43', borderRadius:4}]}, options: Object.assign({}, baseOpts, {indexAxis:'y', scales:Object.assign({},baseOpts.scales,{x:Object.assign({},baseOpts.scales.x,{min:0,max:100})})}) });
+
+    // 5. Status Distribution (doughnut)
+    const forms = DatabaseService.get('standardForms').filter(f=> locationId==='all'||f.locationId===locationId);
+    const statusKeys = ['DUE_TODAY','DUE_SOON','OVERDUE','NOT_STARTED','CANCELLED'];
+    const statusColors = ['#f4c430','#4fa3ff','#ff5555','#5d6883','#ff9f43'];
+    const statusCounts = statusKeys.map(k=>forms.filter(f=>f.status===k).length);
+    destroy('chartStatusDistribution');
+    const c5 = document.getElementById('chartStatusDistribution');
+    if(c5) instances.chartStatusDistribution = new Chart(c5, { type:'doughnut', data:{labels:statusKeys, datasets:[{data:statusCounts, backgroundColor:statusColors, borderWidth:0}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}} });
+  }
+
+  /** Location x Function compliance grid. Plain HTML (no Chart.js), so it renders even if the chart library fails to load. */
+  function renderHeatmap(){
+    const locs = DatabaseService.get('locations'), funcs = DatabaseService.get('functions');
+    const heatEl = document.getElementById('complianceHeatmap');
+    if(heatEl){
+      function cellColor(pct){ return pct>=95?'#2ecc71':pct>=90?'#f4c430':pct>=80?'#ff9f43':'#ff5555'; }
+      let html = '<div style="overflow-x:auto;"><table class="sf-table" style="min-width:0;"><thead><tr><th>Location</th>' + funcs.map(f=>`<th>${f.name.split(' (')[0]}</th>`).join('') + '</tr></thead><tbody>';
+      locs.forEach(l=>{
+        html += `<tr><td style="font-weight:700;">${l.name}</td>`;
+        funcs.forEach(fn=>{
+          const due = ScheduleService.activeSchedules().filter(s=>s.locationId===l.id && s.functionId===fn.id && s.dueDate<=ScheduleService.todayStr());
+          const pct = due.length ? Math.round((due.filter(s=>s.completedDate).length/due.length)*100) : 100;
+          html += `<td><span class="pill" style="background:${cellColor(pct)}22; color:${cellColor(pct)}; min-width:48px; justify-content:center;">${pct}%</span></td>`;
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      heatEl.innerHTML = html;
+    }
+  }
+
+  return { renderAll };
+})();
+
+/* ============ AnnualActivityService ============ */
+/* Pure, read-only projection of Standard Form occurrences for ANY year (past, current, future).
+   It never writes to 'schedules' — real persisted schedules are used where they exist (so completion
+   status is always accurate), and future cycles beyond what the live scheduler has generated yet are
+   *computed on the fly* from each SF's frequency. This guarantees zero duplicate schedule records
+   while still letting the UI show 2027, 2028, etc. */
+const AnnualActivityService = (function(){
+  function projectOccurrences(sf, year){
+    const chain = ScheduleService.schedulesForSF(sf.id); // real, sorted asc
+    const results = [];
+    chain.forEach(s=>{ if(new Date(s.dueDate+'T00:00:00').getFullYear()===year) results.push(Object.assign({}, s, {virtual:false})); });
+    let cursorDate = chain.length ? chain[chain.length-1].dueDate : sf.createdDate;
+    const anchor = chain.length ? ScheduleService.anchorDay(sf, chain) : +String(sf.createdDate).slice(8,10);
+    let guard = 0;
+    while(guard++ < 600){
+      const nextDue = ScheduleService.calculateNextDueDate(cursorDate, sf.frequency, anchor);
+      const y = new Date(nextDue+'T00:00:00').getFullYear();
+      if(y > year) break;
+      if(y === year && nextDue > ScheduleService.todayStr() && !results.some(r=>r.dueDate===nextDue)){
+        results.push({ id:'virtual_'+sf.id+'_'+nextDue, sfId:sf.id, locationId:sf.locationId, functionId:sf.functionId, facilityId:sf.facilityId,
+          scheduledDate: cursorDate, dueDate: nextDue, completedDate:null, status:'NOT_STARTED', responsiblePerson:sf.responsiblePerson, submissionId:null, virtual:true });
+      }
+      cursorDate = nextDue;
+    }
+    return results;
+  }
+
+  function getOccurrencesForYear(year, filters){
+    filters = filters || {};
+    const forms = DatabaseService.get('standardForms').filter(f=>f.status!=='CANCELLED');
+    let occ = [];
+    forms.forEach(sf=>{ occ = occ.concat(projectOccurrences(sf, year)); });
+    occ = occ.map(o => Object.assign({}, o, {status: ScheduleService.updateScheduleStatus(o)}));
+    if(filters.locationId && filters.locationId!=='all') occ = occ.filter(o=>o.locationId===filters.locationId);
+    if(filters.functionId && filters.functionId!=='all') occ = occ.filter(o=>o.functionId===filters.functionId);
+    if(filters.facilityId && filters.facilityId!=='all') occ = occ.filter(o=>o.facilityId===filters.facilityId);
+    if(filters.frequency && filters.frequency!=='all') occ = occ.filter(o=>{ const sf=forms.find(f=>f.id===o.sfId); return sf && sf.frequency===filters.frequency; });
+    if(filters.status && filters.status!=='all') occ = occ.filter(o=>o.status===filters.status);
+    if(filters.responsiblePerson && filters.responsiblePerson!=='all') occ = occ.filter(o=>o.responsiblePerson===filters.responsiblePerson);
+    return occ.sort((a,b)=> a.dueDate < b.dueDate ? -1 : 1);
+  }
+  return { getOccurrencesForYear, projectOccurrences };
+})();
+
+/* ============ ExportService ============ */
+/* Export CSV is fully implemented (client-side, no server). exportExcel()/exportPDF() are prepared
+   interfaces for a future release — they intentionally do not fabricate real Excel/PDF output yet. */
+const ExportService = (function(){
+  function rowsJoin(rows, columns, esc){ return rows.map(r=> columns.map(c=>esc(r[c.key])).join(',')).join('\r\n'); }
+  function toCSV(rows, columns){
+    // RFC 4180 quoting; values starting with = + @ get a leading apostrophe so spreadsheets never run them as formulas.
+    const esc = v => { v = (v==null?'':String(v)); if(/^[=+@]/.test(v)) v = "'"+v; v = v.replace(/"/g,'""'); return /[,"\r\n]/.test(v) ? '"'+v+'"' : v; };
+    const header = columns.map(c=>esc(c.label)).join(',');
+    return header + '\r\n' + rowsJoin(rows, columns, esc);
+  }
+  async function exportCSV(rows, columns, filename){
+    const csv = toCSV(rows, columns);
+    const blob = new Blob(['\uFEFF', csv], {type:'text/csv;charset=utf-8;'}); // BOM keeps Indonesian characters intact in Excel
+    try{
+      const dl = (typeof claude !== 'undefined' && claude.use) ? await claude.use('downloads') : null;
+      if(dl){ await dl.save({filename, data:blob}); }
+      else { const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+      UIService.showToast('Export CSV berhasil: '+filename);
+      AuditService.log({action:'EXPORT_CSV', object:'Export', objectId:filename, newValue:(rows.length)+' baris', remarks:'Export CSV'});
+    }catch(e){ console.error('Export CSV error', e); UIService.showToast('Gagal export CSV.'); }
+  }
+  function exportExcel(){ UIService.showToast('Export Excel belum tersedia — direncanakan untuk rilis mendatang.'); }
+  function exportPDF(){ UIService.showToast('Export PDF belum tersedia — direncanakan untuk rilis mendatang.'); }
+  return { exportCSV, exportExcel, exportPDF, toCSV };
+})();
+
+/* ============ AnnualActivityPage ============ */
+const AnnualActivityPage = (function(){
+  let state = { year: new Date().getFullYear(), month: new Date().getMonth(), view:'calendar', locationId:'all', functionId:'all', facilityId:'all', frequency:'all', status:'all', responsiblePerson:'all' };
+  const CAL_COLORS = { COMPLETED:'#2ecc71', DUE_SOON:'#f4c430', DUE_TODAY:'#ff9f43', OVERDUE:'#ff5555', NOT_STARTED:'#5d6883' };
+
+  function setState(key, val){ state[key] = val; UIService.refresh(); }
+  function setView(v){ state.view = v; UIService.refresh(); }
+  function shiftMonth(delta){ let m = state.month + delta; if(m<0){ m=11; state.year -= 1; } else if(m>11){ m=0; state.year += 1; } state.month = m; UIService.refresh(); }
+
+  function sfName(sfId){ const s = DatabaseService.get('standardForms').find(x=>x.id===sfId); return s?s.sfTitle:sfId; }
+  function yearOptions(){ const cur = new Date().getFullYear(); const arr=[]; for(let y=cur-1;y<=cur+5;y++) arr.push(y); return arr; }
+
+  function getFilteredOccurrences(){
+    return AnnualActivityService.getOccurrencesForYear(state.year, {
+      locationId: state.locationId, functionId: state.functionId, facilityId: state.facilityId,
+      frequency: state.frequency, status: state.status, responsiblePerson: state.responsiblePerson
+    });
+  }
+
+  function filterBarHTML(){
+    const locs = DatabaseService.get('locations'), funcs = DatabaseService.get('functions'), facs = DatabaseService.get('facilities');
+    const people = Array.from(new Set(DatabaseService.get('standardForms').map(f=>f.responsiblePerson).filter(Boolean)));
+    return `<div class="toolbar">
+      <select onchange="AnnualActivityPage.setState('year', parseInt(this.value))">${yearOptions().map(y=>`<option value="${y}" ${y===state.year?'selected':''}>${y}</option>`).join('')}</select>
+      <select onchange="AnnualActivityPage.setState('locationId', this.value)"><option value="all">Semua Lokasi</option>${locs.map(l=>`<option value="${l.id}" ${state.locationId===l.id?'selected':''}>${l.name}</option>`).join('')}</select>
+      <select onchange="AnnualActivityPage.setState('functionId', this.value)"><option value="all">Semua Fungsi</option>${funcs.map(f=>`<option value="${f.id}" ${state.functionId===f.id?'selected':''}>${f.name}</option>`).join('')}</select>
+      <select onchange="AnnualActivityPage.setState('facilityId', this.value)"><option value="all">Semua Fasilitas</option>${facs.map(f=>`<option value="${f.id}" ${state.facilityId===f.id?'selected':''}>${f.name}</option>`).join('')}</select>
+      <select onchange="AnnualActivityPage.setState('frequency', this.value)"><option value="all">Semua Frequency</option>${['Weekly','Monthly','Every 3 Months','Every 6 Months','Yearly'].map(fr=>`<option value="${fr}" ${state.frequency===fr?'selected':''}>${fr}</option>`).join('')}</select>
+      <select onchange="AnnualActivityPage.setState('status', this.value)"><option value="all">Semua Status</option>${['COMPLETED','DUE_TODAY','DUE_SOON','OVERDUE','NOT_STARTED'].map(s=>`<option value="${s}" ${state.status===s?'selected':''}>${s.replace('_',' ')}</option>`).join('')}</select>
+      <select onchange="AnnualActivityPage.setState('responsiblePerson', this.value)"><option value="all">Semua PIC</option>${people.map(p=>`<option value="${p}" ${state.responsiblePerson===p?'selected':''}>${p}</option>`).join('')}</select>
+    </div>`;
+  }
+
+  function summaryHTML(occ){
+    const total = occ.length;
+    const completed = occ.filter(o=>o.status==='COMPLETED').length;
+    const overdue = occ.filter(o=>o.status==='OVERDUE').length;
+    const pending = total - completed - overdue;
+    const duePassed = occ.filter(o=> o.dueDate <= ScheduleService.todayStr());
+    const compliance = duePassed.length ? Math.round((duePassed.filter(o=>o.status==='COMPLETED').length/duePassed.length)*100) : 100;
+    const items = [['Total Planned',total,'var(--yellow)'],['Completed',completed,'var(--green)'],['Pending',pending,'var(--blue)'],['Overdue',overdue,'var(--red)'],['Compliance %',compliance+'%','var(--green)']];
+    return `<div class="kpi-grid-5">${items.map(([l,v,c])=>`<div class="kpi-card" style="--kc:${c}"><div class="kpi-top"><span class="kpi-label">${l}</span></div><div class="kpi-value">${v}</div></div>`).join('')}</div>`;
+  }
+
+  function calendarHTML(occ){
+    const monthNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    const firstDay = new Date(state.year, state.month, 1);
+    const startWeekday = firstDay.getDay();
+    const daysInMonth = new Date(state.year, state.month+1, 0).getDate();
+    const monthOcc = occ.filter(o=> new Date(o.dueDate+'T00:00:00').getMonth()===state.month);
+    const byDay = {};
+    monthOcc.forEach(o=>{ const d = new Date(o.dueDate+'T00:00:00').getDate(); (byDay[d]=byDay[d]||[]).push(o); });
+    let cells = '';
+    for(let i=0;i<startWeekday;i++) cells += '<div></div>';
+    for(let d=1; d<=daysInMonth; d++){
+      const items = byDay[d]||[];
+      cells += `<div style="background:var(--navy-800); border:1px solid var(--border); border-radius:8px; padding:6px; min-height:78px;">
+        <div style="font-size:11px; color:var(--muted); font-weight:700; margin-bottom:4px;">${d}</div>
+        ${items.slice(0,3).map(o=>`<div title="${sfName(o.sfId)}" style="font-size:9.5px; background:${CAL_COLORS[o.status]||'#5d6883'}22; color:${CAL_COLORS[o.status]||'#5d6883'}; padding:2px 4px; border-radius:4px; margin-bottom:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${sfName(o.sfId)}</div>`).join('')}
+        ${items.length>3?`<div style="font-size:9px; color:var(--muted-dim);">+${items.length-3} lagi</div>`:''}
+      </div>`;
+    }
+    const monthNav = `<div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+      <span class="icon-sm" onclick="AnnualActivityPage.shiftMonth(-1)"><i class="fa-solid fa-chevron-left"></i></span>
+      <div style="font-weight:800; font-size:15px;">${monthNames[state.month]} ${state.year}</div>
+      <span class="icon-sm" onclick="AnnualActivityPage.shiftMonth(1)"><i class="fa-solid fa-chevron-right"></i></span>
+      <div style="margin-left:auto; display:flex; gap:10px; font-size:10.5px; color:var(--muted); flex-wrap:wrap;">
+        ${Object.entries(CAL_COLORS).map(([k,c])=>`<span><span style="display:inline-block; width:8px; height:8px; border-radius:2px; background:${c}; margin-right:4px;"></span>${k.replace('_',' ')}</span>`).join('')}
+      </div>
+    </div>`;
+    const weekHeaders = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'].map(w=>`<div style="font-size:10px; color:var(--muted-dim); font-weight:700; text-align:center; padding-bottom:4px;">${w}</div>`).join('');
+    return `${monthNav}<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px;">${weekHeaders}${cells}</div>`;
+  }
+
+  function tableHTML(occ){
+    const forms = DatabaseService.get('standardForms');
+    const rows = occ.map(o=>`<tr>
+      <td>${formatDate(o.dueDate)}</td><td>${refName('locations',o.locationId)}</td><td>${refName('functions',o.functionId)}</td><td>${refName('facilities',o.facilityId)}</td>
+      <td>${sfName(o.sfId)}</td><td>${(forms.find(f=>f.id===o.sfId)||{}).frequency||'-'}</td>
+      <td>${o.responsiblePerson||'-'}</td><td><span class="pill" style="background:${CAL_COLORS[o.status]}22; color:${CAL_COLORS[o.status]};">${o.status.replace('_',' ')}</span></td>
+      <td>${formatDate(o.completedDate)}</td>
+    </tr>`).join('');
+    return `<div class="sf-table-wrap"><table class="sf-table"><thead><tr><th>Date</th><th>Location</th><th>Function</th><th>Facility</th><th>SF</th><th>Frequency</th><th>Responsible</th><th>Status</th><th>Completion Date</th></tr></thead><tbody>${rows || '<tr><td colspan="9" style="text-align:center; color:var(--muted);">Tidak ada data untuk filter ini.</td></tr>'}</tbody></table></div>`;
+  }
+
+  function ganttHTML(occ){
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const sfIds = Array.from(new Set(occ.map(o=>o.sfId)));
+    const rows = sfIds.map(sfId=>{
+      const cells = months.map((m,idx)=>{
+        const inMonth = occ.filter(o=>o.sfId===sfId && new Date(o.dueDate+'T00:00:00').getMonth()===idx);
+        if(!inMonth.length) return '<td></td>';
+        const o = inMonth[0];
+        return `<td style="text-align:center;"><span style="display:inline-block; width:16px; height:16px; border-radius:4px; background:${CAL_COLORS[o.status]};" title="${formatDate(o.dueDate)} - ${o.status}"></span></td>`;
+      }).join('');
+      return `<tr><td style="font-weight:700; white-space:nowrap;">${sfName(sfId)}</td>${cells}</tr>`;
+    }).join('');
+    return `<div class="sf-table-wrap"><table class="sf-table"><thead><tr><th>Standard Form</th>${months.map(m=>`<th style="text-align:center;">${m}</th>`).join('')}</tr></thead><tbody>${rows || `<tr><td colspan="13" style="text-align:center; color:var(--muted);">Tidak ada data.</td></tr>`}</tbody></table></div>`;
+  }
+
+  function exportCSV(){
+    const occ = getFilteredOccurrences();
+    const forms = DatabaseService.get('standardForms');
+    const rows = occ.map(o=>({
+      date:o.dueDate, location:refName('locations',o.locationId), function:refName('functions',o.functionId), facility:refName('facilities',o.facilityId),
+      sf:sfName(o.sfId), frequency:(forms.find(f=>f.id===o.sfId)||{}).frequency||'-',
+      responsible:o.responsiblePerson||'-', status:o.status, completionDate:o.completedDate||'-'
+    }));
+    ExportService.exportCSV(rows, [
+      {key:'date',label:'Date'},{key:'location',label:'Location'},{key:'function',label:'Function'},{key:'facility',label:'Facility'},
+      {key:'sf',label:'SF'},{key:'frequency',label:'Frequency'},{key:'responsible',label:'Responsible'},{key:'status',label:'Status'},{key:'completionDate',label:'Completion Date'}
+    ], 'annual-activity-'+state.year+'.csv');
+  }
+
+  function render(){
+    const occ = getFilteredOccurrences();
+    const tabs = `<div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+      ${['calendar','table','gantt'].map(v=>`<button class="btn ${state.view===v?'btn-primary':'btn-ghost'}" onclick="AnnualActivityPage.setView('${v}')">${v==='calendar'?'Calendar':v==='table'?'Yearly Table':'Gantt'}</button>`).join('')}
+      <button class="btn btn-ghost" style="margin-left:auto;" onclick="AnnualActivityPage.exportCSV()"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+      <button class="btn btn-ghost" onclick="ExportService.exportExcel()"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
+      <button class="btn btn-ghost" onclick="ExportService.exportPDF()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+    </div>`;
+    const body = state.view==='calendar' ? calendarHTML(occ) : state.view==='table' ? tableHTML(occ) : ganttHTML(occ);
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Annual Activity</span></div>
+      <div class="page-head"><div><div class="page-title">Annual Activity Control Center</div><div class="page-sub">Proyeksi aktivitas tahunan lintas tahun — mendukung tahun mendatang secara otomatis</div></div></div>
+      ${filterBarHTML()}
+      ${summaryHTML(occ)}
+      ${tabs}
+      ${body}`;
+  }
+
+  return { render, setState, setView, shiftMonth, exportCSV };
+})();
+
+
+/* ============ JadwalPage (operational schedule list, real data from 'schedules') ============ */
+const JadwalPage = (function(){
+  let f = { search:'', status:'all', openOnly:false };
+  const COLORS = { COMPLETED:'var(--green)', DUE_TODAY:'var(--orange)', DUE_SOON:'var(--yellow)', OVERDUE:'var(--red)', NOT_STARTED:'var(--muted-dim)' };
+  function setF(k,v){ f[k]=v; UIService.refresh(); }
+  function render(locationId){
+    const forms = DatabaseService.get('standardForms');
+    let list = DatabaseService.get('schedules').map(s=>Object.assign({}, s, {status: ScheduleService.updateScheduleStatus(s)}));
+    if(locationId && locationId!=='all') list = list.filter(s=>s.locationId===locationId);
+    if(f.openOnly) list = list.filter(s=>!s.completedDate);
+    if(f.status!=='all') list = list.filter(s=>s.status===f.status);
+    if(f.search){
+      const q = f.search.toLowerCase();
+      list = list.filter(s=>{ const sf = forms.find(x=>x.id===s.sfId)||{}; return [sf.sfNumber,sf.sfTitle,refName('facilities',s.facilityId),s.responsiblePerson].join(' ').toLowerCase().includes(q); });
+    }
+    list.sort((a,b)=> a.dueDate < b.dueDate ? -1 : 1);
+    const rows = list.map(s=>{
+      const sf = forms.find(x=>x.id===s.sfId)||{};
+      const col = COLORS[s.status]||'var(--muted)';
+      return `<tr>
+        <td>${SettingsService.formatDate(s.scheduledDate)}</td>
+        <td style="font-weight:700;">${SettingsService.formatDate(s.dueDate)}</td>
+        <td>${refName('locations',s.locationId)}</td><td>${refName('functions',s.functionId)}</td><td>${refName('facilities',s.facilityId)}</td>
+        <td>${sf.sfTitle||s.sfId}</td><td>${sf.frequency||'-'}</td><td>${s.responsiblePerson||'-'}</td>
+        <td><span class="pill" style="background:color-mix(in srgb, ${col} 18%, transparent); color:${col};">${s.status.replace('_',' ')}</span></td>
+        <td>${SettingsService.formatDate(s.completedDate)}</td>
+        <td><span class="icon-sm" title="Buka detail SF" onclick="UIService.openSFDetail('${s.sfId}')"><i class="fa-solid fa-eye"></i></span></td>
+      </tr>`;
+    }).join('');
+    const statuses = ['COMPLETED','DUE_TODAY','DUE_SOON','OVERDUE','NOT_STARTED'];
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Jadwal</span></div>
+      <div class="page-head"><div><div class="page-title">Jadwal</div><div class="page-sub">${list.length} jadwal &middot; ${locationId==='all'?'Semua Lokasi':refName('locations',locationId)} &middot; selesai lewat alur upload &amp; approval di detail SF</div></div></div>
+      <div class="toolbar">
+        <div class="tb-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Cari SF, fasilitas, PIC..." value="${f.search}" oninput="JadwalPage.setF('search', this.value)"></div>
+        <select onchange="JadwalPage.setF('status', this.value)"><option value="all">Semua Status</option>${statuses.map(s=>`<option value="${s}" ${f.status===s?'selected':''}>${s.replace('_',' ')}</option>`).join('')}</select>
+        <label style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted);"><input type="checkbox" ${f.openOnly?'checked':''} onchange="JadwalPage.setF('openOnly', this.checked)"> Hanya yang belum selesai</label>
+      </div>
+      <div class="sf-table-wrap">
+        ${list.length ? `<table class="sf-table"><thead><tr><th>Scheduled</th><th>Due Date</th><th>Location</th><th>Function</th><th>Facility</th><th>SF</th><th>Frequency</th><th>Responsible</th><th>Status</th><th>Completed</th><th></th></tr></thead><tbody>${rows}</tbody></table>`
+        : `<div class="empty-state"><i class="fa-solid fa-calendar-xmark"></i><div>Tidak ada jadwal yang cocok dengan filter.</div></div>`}
+      </div>`;
+  }
+  return { render, setF };
+})();
+
+
+/* ============ DokumenPage (document library across all SF: templates + completed documents) ============ */
+const DokumenPage = (function(){
+  let f = { search:'', type:'all', status:'all' };
+  const COLORS = { TEMPLATE:'var(--blue)', PENDING:'var(--yellow)', APPROVED:'var(--green)', CANCELLED:'var(--red)' };
+  function setF(k,v){ f[k]=v; UIService.refresh(); }
+  function pill(label, key){ const col=COLORS[key]||'var(--muted)'; return `<span class="pill" style="background:color-mix(in srgb, ${col} 18%, transparent); color:${col};">${label}</span>`; }
+
+  function collect(locationId){
+    const forms = DatabaseService.get('standardForms');
+    const items = [];
+    forms.forEach(sf=>{
+      if(sf.templateFile) items.push({ kind:'TEMPLATE', ref:sf.id, sf, name:sf.templateFile.name, by:'-', date:sf.updatedDate||sf.createdDate, status:'TEMPLATE', demo:!!sf.templateFile.demo || !sf.templateFile.dataUrl });
+    });
+    DocumentService.all().forEach(d=>{
+      const sf = forms.find(x=>x.id===d.sfId); if(!sf) return;
+      items.push({ kind:'COMPLETED', ref:d.id, sf, name:d.name, by:d.uploadedBy, date:d.uploadedAt, status:d.status, demo:!d.dataUrl });
+    });
+    let list = items;
+    if(locationId && locationId!=='all') list = list.filter(i=>i.sf.locationId===locationId);
+    if(f.type!=='all') list = list.filter(i=>i.kind===f.type);
+    if(f.status!=='all') list = list.filter(i=>i.status===f.status);
+    if(f.search){ const q=f.search.toLowerCase(); list = list.filter(i=>[i.name,i.sf.sfNumber,i.sf.sfTitle,i.by].join(' ').toLowerCase().includes(q)); }
+    return list.sort((a,b)=> (a.date||'') < (b.date||'') ? 1 : -1);
+  }
+
+  function download(kind, ref){
+    if(kind==='TEMPLATE'){ const sf = SFService.get(ref); if(sf) FileService.download(sf.templateFile, {object:'Template', objectId:ref}); }
+    else { const d = DocumentService.get(ref); if(d) FileService.download(d, {object:'Document', objectId:ref}); }
+  }
+
+  function render(locationId){
+    const list = collect(locationId);
+    const rows = list.map(i=>`<tr>
+      <td>${pill(i.kind==='TEMPLATE'?'Template':'Completed', i.kind==='TEMPLATE'?'TEMPLATE':'APPROVED')}</td>
+      <td style="font-weight:700;">${i.name}${i.demo?' <span style="color:var(--muted-dim); font-size:10.5px;">(demo)</span>':''}</td>
+      <td>${i.sf.sfNumber}<div style="font-size:11px; color:var(--muted);">${i.sf.sfTitle}</div></td>
+      <td>${refName('locations',i.sf.locationId)}</td><td>${refName('functions',i.sf.functionId)}</td><td>${refName('facilities',i.sf.facilityId)}</td>
+      <td>${i.by}</td><td>${SettingsService.formatDate(i.date)}</td>
+      <td>${i.kind==='TEMPLATE' ? '-' : pill(i.status==='PENDING'?'Pending Review':i.status, i.status)}</td>
+      <td><div class="row-actions">
+        <span class="icon-sm" title="Buka detail SF" onclick="UIService.openSFDetail('${i.sf.id}')"><i class="fa-solid fa-eye"></i></span>
+        <span class="icon-sm" title="Download" onclick="DokumenPage.download('${i.kind}','${i.ref}')"><i class="fa-solid fa-download"></i></span>
+      </div></td></tr>`).join('');
+    const nT = list.filter(i=>i.kind==='TEMPLATE').length, nC = list.length - nT;
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Dokumen</span></div>
+      <div class="page-head"><div><div class="page-title">Dokumen</div><div class="page-sub">${nT} template &middot; ${nC} dokumen terisi &middot; ${locationId==='all'?'Semua Lokasi':refName('locations',locationId)} &middot; upload &amp; review dilakukan di detail SF</div></div></div>
+      <div class="toolbar">
+        <div class="tb-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Cari file, nomor SF, judul, pengunggah..." value="${f.search}" oninput="DokumenPage.setF('search', this.value)"></div>
+        <select onchange="DokumenPage.setF('type', this.value)"><option value="all">Semua Tipe</option><option value="TEMPLATE" ${f.type==='TEMPLATE'?'selected':''}>Template</option><option value="COMPLETED" ${f.type==='COMPLETED'?'selected':''}>Dokumen Terisi</option></select>
+        <select onchange="DokumenPage.setF('status', this.value)"><option value="all">Semua Status</option><option value="PENDING" ${f.status==='PENDING'?'selected':''}>Pending Review</option><option value="APPROVED" ${f.status==='APPROVED'?'selected':''}>Approved</option><option value="CANCELLED" ${f.status==='CANCELLED'?'selected':''}>Cancelled</option></select>
+      </div>
+      <div class="sf-table-wrap">
+        ${list.length ? `<table class="sf-table"><thead><tr><th>Tipe</th><th>File</th><th>Standard Form</th><th>Location</th><th>Function</th><th>Facility</th><th>Diunggah Oleh</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`
+        : `<div class="empty-state"><i class="fa-solid fa-folder-open"></i><div>Belum ada dokumen yang cocok dengan filter.</div></div>`}
+      </div>`;
+  }
+  return { render, setF, download };
+})();
+
+/* ============ SettingsService ============ */
+const SettingsService = (function(){
+  const KEY = 'sftrack_settings';
+  const DEFAULTS = {
+    dateFormat: 'iso', // 'iso' = YYYY-MM-DD | 'dmy' = DD/MM/YYYY | 'mdy' = MM/DD/YYYY  (presentation only; storage stays ISO)
+    defaultDashboard: 'dashboard',
+    theme: 'dark', // 'dark' | 'light'
+    notifTypesEnabled: { OVERDUE:true, DUE_TODAY:true, DUE_SOON:true, MISSING_DOCUMENT:true, NEW_SUBMISSION:true, SUPERVISOR_REVIEW_REQUIRED:true, CANCELLED_SUBMISSION:true }
+  };
+  function getAll(){
+    try{
+      const saved = JSON.parse(localStorage.getItem(KEY)) || {};
+      const s = Object.assign({}, DEFAULTS, saved);
+      s.notifTypesEnabled = Object.assign({}, DEFAULTS.notifTypesEnabled, saved.notifTypesEnabled || {});
+      return s;
+    }catch(e){ return Object.assign({}, DEFAULTS); }
+  }
+  function get(key){ return getAll()[key]; }
+  function persist(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){ console.error('Settings save error', e); } }
+  function set(key, val){
+    const s = getAll(); const old = s[key]; s[key] = val; persist(s);
+    if(key==='theme') applyTheme(val);
+    if(old !== val && key!=='theme') AuditService.log({action:'CHANGE_SETTINGS', object:'Settings', objectId:key, oldValue:old, newValue:val, remarks:'Mengubah pengaturan'});
+  }
+  function setNotifType(type, enabled){
+    const s = getAll(); const old = s.notifTypesEnabled[type]; s.notifTypesEnabled[type] = enabled; persist(s);
+    if(old !== enabled) AuditService.log({action:'CHANGE_SETTINGS', object:'Settings', objectId:'notif:'+type, oldValue:old, newValue:enabled, remarks:'Preferensi notifikasi'});
+  }
+  function setWarningDays(n){
+    const old = ScheduleService.getConfig().dueSoonWarningDays;
+    ScheduleService.setWarningDays(n);
+    const now = ScheduleService.getConfig().dueSoonWarningDays;
+    if(old !== now) AuditService.log({action:'CHANGE_SETTINGS', object:'Settings', objectId:'dueSoonWarningDays', oldValue:old, newValue:now, remarks:'Periode peringatan Due Soon'});
+  }
+  function applyTheme(theme){ document.documentElement.setAttribute('data-theme', theme==='light' ? 'light' : 'dark'); }
+  const p2 = n => String(n).padStart(2,'0');
+  function fmtParts(y, m, d){
+    const fmt = get('dateFormat');
+    if(fmt==='dmy') return p2(d)+'/'+p2(m)+'/'+y;
+    if(fmt==='mdy') return p2(m)+'/'+p2(d)+'/'+y;
+    return y+'-'+p2(m)+'-'+p2(d);
+  }
+  /** Presentation only. Accepts ISO date (YYYY-MM-DD) or ISO timestamp. Never alters stored data. */
+  function formatDate(v){
+    if(!v) return '-';
+    const s = String(v);
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+    if(m) return fmtParts(+m[1], +m[2], +m[3]);
+    const d = new Date(s);
+    if(isNaN(d)) return s;
+    return fmtParts(d.getFullYear(), d.getMonth()+1, d.getDate());
+  }
+  function formatDateTime(v){
+    if(!v) return '-';
+    const s = String(v);
+    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return formatDate(s);
+    const d = new Date(s);
+    if(isNaN(d)) return s;
+    return fmtParts(d.getFullYear(), d.getMonth()+1, d.getDate()) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+  }
+  return { getAll, get, set, setNotifType, setWarningDays, applyTheme, formatDate, formatDateTime };
+})();
+/* Centralized presentation helpers used by every screen (storage format is never changed). */
+function formatDate(v){ return SettingsService.formatDate(v); }
+function formatDateTime(v){ return SettingsService.formatDateTime(v); }
+
+/* ============ GlobalSearch (topbar) ============ */
+const GlobalSearch = (function(){
+  function matches(f, q){
+    const loc = (DatabaseService.get('locations').find(l=>l.id===f.locationId)||{}).name||'';
+    const fn = (DatabaseService.get('functions').find(x=>x.id===f.functionId)||{}).name||'';
+    const fac = (DatabaseService.get('facilities').find(x=>x.id===f.facilityId)||{}).name||'';
+    const hay = [f.sfNumber,f.sfTitle,loc,fn,fac,f.responsiblePerson,f.status,String(f.status||'').replace('_',' ')].join(' ').toLowerCase();
+    return q.split(/\s+/).filter(Boolean).every(tok => hay.indexOf(tok) > -1); // all words must match, in any order/field
+  }
+  function results(query){
+    const q = (query||'').trim().toLowerCase();
+    if(!q) return [];
+    return DatabaseService.get('standardForms').filter(f=>matches(f,q)).slice(0,8);
+  }
+  function onInput(query){
+    const panel = document.getElementById('globalSearchPanel');
+    const q = (query||'').trim();
+    if(!q){ panel.classList.remove('open'); panel.innerHTML=''; return; }
+    const list = results(q);
+    panel.innerHTML = list.length
+      ? list.map(f=>`<div class="dropdown-item" style="cursor:pointer;" onclick="GlobalSearch.select('${f.id}')"><i class="fa-solid fa-file-signature"></i><div><div style="font-weight:700;">${f.sfTitle}</div><div style="font-size:11px; color:var(--muted);">${f.sfNumber} &middot; ${f.status.replace('_',' ')}</div></div></div>`).join('')
+      : '<div style="padding:14px; font-size:12px; color:var(--muted);">Tidak ada hasil untuk "'+q+'".</div>';
+    panel.classList.add('open');
+  }
+  function select(sfId){
+    document.getElementById('globalSearchPanel').classList.remove('open');
+    document.getElementById('globalSearchInput').value = '';
+    UIService.openSFDetail(sfId);
+  }
+  return { onInput, select, results };
+})();
+
+/* ============ ReportsPage (Management Summary + Report Center) ============ */
+const ReportsPage = (function(){
+  let activeReport = 'compliance';
+  const REPORTS = {
+    compliance: 'A. SF Compliance Report', overdue: 'B. Overdue Report', annual: 'C. Annual Activity Report',
+    submission: 'D. Document Submission Report', audit: 'E. Audit Trail Report',
+    locationPerf: 'F. Location Performance Report', functionPerf: 'G. Function Performance Report'
+  };
+  function setReport(key){ activeReport = key; UIService.refresh(); }
+  function sfName(sfId){ const s=DatabaseService.get('standardForms').find(x=>x.id===sfId); return s?s.sfTitle:sfId; }
+
+  function managementSummaryHTML(){
+    const m = MetricsService.compute('all');
+    const items = [
+      ['Total Active SF', m.totalActive, 'var(--yellow)'], ['Total Locations', m.totalLocations, 'var(--blue)'], ['Total Facilities', m.totalFacilities, 'var(--blue)'],
+      ['Completion %', m.compliancePct+'%', 'var(--green)'], ['Overdue', m.overdue, 'var(--red)'], ['Due Soon', m.dueSoon, 'var(--yellow)'],
+      ['Audit Readiness', m.readiness+'%', 'var(--yellow)'], ['Missing Documents', m.missingDocuments, 'var(--orange)']
+    ];
+    return `<div class="kpi-grid">${items.map(([l,v,c])=>`<div class="kpi-card" style="--kc:${c}"><div class="kpi-top"><span class="kpi-label">${l}</span></div><div class="kpi-value">${v}</div></div>`).join('')}</div>`;
+  }
+
+  function complianceReport(){
+    const forms = DatabaseService.get('standardForms').filter(f=>f.status!=='CANCELLED');
+    const rows = forms.map(f=>({sfNumber:f.sfNumber, sfTitle:f.sfTitle, location:refName('locations',f.locationId), function:refName('functions',f.functionId), facility:refName('facilities',f.facilityId), frequency:f.frequency, responsible:f.responsiblePerson, status:f.status, nextDue:f.nextDueDate}));
+    const cols = [['sfNumber','SF Number'],['sfTitle','SF Title'],['location','Location'],['function','Function'],['facility','Facility'],['frequency','Frequency'],['responsible','Responsible'],['status','Status'],['nextDue','Next Due','date']];
+    return {rows, cols};
+  }
+  function overdueReport(){
+    const list = ScheduleService.getOverdueList('all');
+    const rows = list.map(s=>({sf:sfName(s.sfId), location:refName('locations',s.locationId), function:refName('functions',s.functionId), facility:refName('facilities',s.facilityId), dueDate:s.dueDate, daysOverdue:ScheduleService.daysBetween(s.dueDate, ScheduleService.todayStr()), responsible:s.responsiblePerson}));
+    const cols = [['sf','SF'],['location','Location'],['function','Function'],['facility','Facility'],['dueDate','Due Date','date'],['daysOverdue','Days Overdue'],['responsible','Responsible']];
+    return {rows, cols};
+  }
+  function annualReport(){
+    const occ = AnnualActivityService.getOccurrencesForYear(new Date().getFullYear(), {});
+    const forms = DatabaseService.get('standardForms');
+    const rows = occ.map(o=>({date:o.dueDate, location:refName('locations',o.locationId), function:refName('functions',o.functionId), facility:refName('facilities',o.facilityId), sf:sfName(o.sfId), frequency:(forms.find(f=>f.id===o.sfId)||{}).frequency||'-', status:o.status, completionDate:o.completedDate||'-'}));
+    const cols = [['date','Date','date'],['location','Location'],['function','Function'],['facility','Facility'],['sf','SF'],['frequency','Frequency'],['status','Status'],['completionDate','Completion Date','date']];
+    return {rows, cols};
+  }
+  function submissionReport(){
+    const docs = DocumentService.all();
+    const rows = docs.map(d=>({sf:sfName(d.sfId), file:d.name, uploadedBy:d.uploadedBy, uploadedAt:d.uploadedAt, status:d.status, reviewedBy:d.reviewedBy||'-', remarks:d.status==='CANCELLED'?(d.cancellationReason||'-'):(d.remark||'-')}));
+    const cols = [['sf','SF'],['file','File'],['uploadedBy','Uploaded By'],['uploadedAt','Uploaded At','datetime'],['status','Status'],['reviewedBy','Reviewed By'],['remarks','Remarks']];
+    return {rows, cols};
+  }
+  function auditReport(){
+    if(!AuthService.can('VIEW_AUDIT_TRAIL')) return {rows:[], cols:[['denied','Akses ditolak']]};
+    const rows = AuditService.all().map(l=>({timestamp:l.timestamp, user:l.user, role:l.role, action:l.action, object:l.object, objectId:l.objectId, oldValue:l.oldValue, newValue:l.newValue, remarks:l.remarks}));
+    const cols = [['timestamp','Timestamp','datetime'],['user','User'],['role','Role'],['action','Action'],['object','Object'],['objectId','Object ID'],['oldValue','Old Value'],['newValue','New Value'],['remarks','Remarks']];
+    return {rows, cols};
+  }
+  function locationPerfReport(){
+    const locs = DatabaseService.get('locations');
+    const rows = locs.map(l=>{
+      const due = ScheduleService.activeSchedules().filter(s=>s.locationId===l.id && s.dueDate<=ScheduleService.todayStr());
+      const compliance = due.length ? Math.round((due.filter(s=>s.completedDate).length/due.length)*100) : 100;
+      const sfCount = DatabaseService.get('standardForms').filter(f=>f.locationId===l.id && f.status!=='CANCELLED').length;
+      const overdue = due.filter(s=>!s.completedDate).length;
+      return {location:l.name, totalSF:sfCount, compliancePct:compliance+'%', overdue};
+    });
+    const cols = [['location','Location'],['totalSF','Total SF'],['compliancePct','Compliance %'],['overdue','Overdue']];
+    return {rows, cols};
+  }
+  function functionPerfReport(){
+    const funcs = DatabaseService.get('functions');
+    const rows = funcs.map(fn=>{
+      const due = ScheduleService.activeSchedules().filter(s=>s.functionId===fn.id && s.dueDate<=ScheduleService.todayStr());
+      const compliance = due.length ? Math.round((due.filter(s=>s.completedDate).length/due.length)*100) : 100;
+      const sfCount = DatabaseService.get('standardForms').filter(f=>f.functionId===fn.id && f.status!=='CANCELLED').length;
+      const overdue = due.filter(s=>!s.completedDate).length;
+      return {function:fn.name, totalSF:sfCount, compliancePct:compliance+'%', overdue};
+    });
+    const cols = [['function','Function'],['totalSF','Total SF'],['compliancePct','Compliance %'],['overdue','Overdue']];
+    return {rows, cols};
+  }
+  function dataFor(key){
+    return { compliance:complianceReport, overdue:overdueReport, annual:annualReport, submission:submissionReport, audit:auditReport, locationPerf:locationPerfReport, functionPerf:functionPerfReport }[key]();
+  }
+
+  function visibleReports(){ return Object.keys(REPORTS).filter(k => k!=='audit' || AuthService.can('VIEW_AUDIT_TRAIL')); }
+  function fmtCell(v, type){ if(v==null || v==='') return '-'; if(type==='date') return formatDate(v); if(type==='datetime') return formatDateTime(v); return v; }
+  function render(){
+    if(!AuthService.can('VIEW_REPORTS')) return UIService.deniedHTML('Reports');
+    if(visibleReports().indexOf(activeReport)<0) activeReport = 'compliance';
+    const {rows, cols} = dataFor(activeReport);
+    const tableRows = rows.map(r=>`<tr>${cols.map(([k,,t])=>`<td>${fmtCell(r[k], t)}</td>`).join('')}</tr>`).join('');
+    const tabs = visibleReports().map(k=>`<button class="btn ${activeReport===k?'btn-primary':'btn-ghost'}" style="font-size:11.5px; padding:7px 12px;" onclick="ReportsPage.setReport('${k}')">${REPORTS[k]}</button>`).join('');
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Reports</span></div>
+      <div class="page-head"><div><div class="page-title">Management Summary</div><div class="page-sub">Ringkasan eksekutif seluruh sistem</div></div></div>
+      ${managementSummaryHTML()}
+      <div class="page-head" style="margin-top:26px;"><div><div class="page-title">Report Center</div><div class="page-sub">${rows.length} baris data &middot; ${REPORTS[activeReport]}</div></div>
+        <button class="btn btn-primary" onclick="ReportsPage.exportActive()"><i class="fa-solid fa-file-csv"></i> Export CSV</button></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">${tabs}</div>
+      <div class="sf-table-wrap"><table class="sf-table"><thead><tr>${cols.map(([,label])=>`<th>${label}</th>`).join('')}</tr></thead><tbody>${tableRows || `<tr><td colspan="${cols.length}" style="text-align:center; color:var(--muted);">No data found. Tidak ada data.</td></tr>`}</tbody></table></div>`;
+  }
+
+  function exportActive(){
+    if(!AuthService.guard('VIEW_REPORTS')) return;
+    if(activeReport==='audit' && !AuthService.guard('VIEW_AUDIT_TRAIL')) return;
+    const {rows, cols} = dataFor(activeReport);
+    ExportService.exportCSV(rows, cols.map(([key,label])=>({key,label})), activeReport+'-report.csv');
+  }
+
+  return { render, setReport, exportActive };
+})();
+
+/* ============ MasterData (service: status, safe delete, reference counting) ============ */
+const MasterData = (function(){
+  const LABEL = { locations:'Location', functions:'Function', facilities:'Facility', responsiblePersons:'Responsible Person', users:'User' };
+  const FK = { locations:'locationId', functions:'functionId', facilities:'facilityId' };
+  function isActive(rec){ return !rec || rec.status !== 'INACTIVE'; }
+  /** Active records for NEW selections; keepId keeps an already-assigned (possibly inactive) value visible when editing. */
+  function activeList(coll, keepId){ return DatabaseService.get(coll).filter(r => isActive(r) || r.id===keepId); }
+  /** Returns false (and a message) for empty names or characters that could break HTML rendering. */
+  function cleanName(raw, label){
+    const v = String(raw||'').trim().replace(/\s+/g,' ');
+    if(!v){ UIService.showToast((label||'Nama')+' wajib diisi.'); return null; }
+    if(/[<>"]/.test(v)){ UIService.showToast((label||'Nama')+' tidak boleh mengandung karakter < > atau tanda kutip ganda.'); return null; }
+    return v;
+  }
+  function referenceCount(coll, id){
+    const sfs = DatabaseService.get('standardForms'), sch = DatabaseService.get('schedules'), docs = DatabaseService.get('documents');
+    const facs = DatabaseService.get('facilities'), subs = DatabaseService.get('submissions'), logs = DatabaseService.get('auditLogs');
+    const counts = { standardForms:0, schedules:0, submissions:0, documents:0, auditLogs:0, facilities:0 };
+    const k = FK[coll];
+    if(k){
+      const mine = sfs.filter(s=>s[k]===id);
+      const ids = new Set(mine.map(s=>s.id));
+      counts.standardForms = mine.length;
+      counts.schedules = sch.filter(s=>s[k]===id).length;
+      counts.documents = docs.filter(d=>ids.has(d.sfId)).length;
+      counts.submissions = subs.filter(s=>s[k]===id || ids.has(s.sfId)).length;
+      if(coll==='locations') counts.facilities = facs.filter(f=>f.locationId===id).length;
+      if(coll==='functions') counts.facilities = facs.filter(f=>f.functionId===id).length;
+    }
+    if(coll==='responsiblePersons'){
+      const rp = DatabaseService.get(coll).find(r=>r.id===id);
+      if(rp){ counts.standardForms = sfs.filter(s=>s.responsiblePerson===rp.name).length; counts.schedules = sch.filter(s=>s.responsiblePerson===rp.name).length; }
+    }
+    // The record's own creation entry does not count as a reference; every other audit entry about it does.
+    counts.auditLogs = logs.filter(l=>l.objectId===id && String(l.action).indexOf('CREATE_')!==0).length;
+    const total = Object.keys(counts).reduce((s,x)=>s+counts[x],0);
+    return { counts, total };
+  }
+  function responsibleOptions(current){
+    const act = DatabaseService.get('responsiblePersons').filter(isActive);
+    const names = act.map(r=>r.name);
+    let html = '<option value="">-- Pilih Responsible Person --</option>';
+    if(current && names.indexOf(current)<0) html += `<option value="${current}" selected>${current} (data lama)</option>`;
+    html += act.map(r=>`<option value="${r.name}" ${r.name===current?'selected':''}>${r.name}${r.employeeId?' ('+r.employeeId+')':''}</option>`).join('');
+    return html;
+  }
+  /** Non-destructive migrations (run on every load, idempotent). */
+  function migrateStatus(){
+    ['locations','functions','facilities'].forEach(coll=>{
+      const list = DatabaseService.get(coll);
+      if(list.some(r=>!r.status)) DatabaseService.set(coll, list.map(r=> r.status ? r : Object.assign({}, r, {status:'ACTIVE'})));
+    });
+  }
+  function migrateResponsiblePersons(){
+    try{ if(localStorage.getItem('sftrack_rp_migrated')==='true') return; }catch(e){}
+    if(DatabaseService.get('responsiblePersons').length===0){
+      const forms = DatabaseService.get('standardForms');
+      const seen = {}; const out = [];
+      forms.forEach(f=>{
+        const n = (f.responsiblePerson||'').trim();
+        if(!n || seen[n]) return; seen[n] = true;
+        out.push({ id:DatabaseService.uid('rp'), name:n, employeeId:'EMP-'+String(out.length+1).padStart(3,'0'), department:(DatabaseService.get('functions').find(x=>x.id===f.functionId)||{}).name||'-', locationId:f.locationId||'', status:'ACTIVE' });
+      });
+      if(out.length) DatabaseService.set('responsiblePersons', out);
+    }
+    try{ localStorage.setItem('sftrack_rp_migrated','true'); }catch(e){}
+  }
+  return { LABEL, isActive, activeList, cleanName, referenceCount, responsibleOptions, migrateStatus, migrateResponsiblePersons };
+})();
+
+/* ============ MasterDataPage ============ */
+const MasterDataPage = (function(){
+  let tab = 'locations';
+  function setTab(t){ tab = t; UIService.refresh(); }
+  const inp = 'padding:9px 11px; background:var(--navy-950); border:1px solid var(--border); border-radius:7px;';
+  function n(coll,id){ const r=DatabaseService.get(coll).find(x=>x.id===id); return r?r.name:'-'; }
+  function statusPill(rec){ const a = MasterData.isActive(rec); return `<span class="pill" style="background:color-mix(in srgb, ${a?'var(--green)':'var(--muted-dim)'} 18%, transparent); color:${a?'var(--green)':'var(--muted)'};">${a?'ACTIVE':'INACTIVE'}</span>`; }
+  function actions(coll, rec, canDelete){
+    return `<div class="row-actions">
+      <span class="icon-sm" title="${MasterData.isActive(rec)?'Nonaktifkan':'Aktifkan'}" onclick="MasterDataPage.toggleStatus('${coll}','${rec.id}')"><i class="fa-solid ${MasterData.isActive(rec)?'fa-toggle-on':'fa-toggle-off'}" style="color:${MasterData.isActive(rec)?'var(--green)':'var(--muted-dim)'}"></i></span>
+      ${canDelete?`<span class="icon-sm" title="Hapus (hanya jika tidak dipakai)" onclick="MasterDataPage.deleteEntity('${coll}','${rec.id}')"><i class="fa-solid fa-trash" style="color:var(--red)"></i></span>`:''}
+    </div>`;
+  }
+  function empty(msg){ return `<div class="empty-state"><i class="fa-solid fa-inbox"></i><div>${msg}</div></div>`; }
+
+  function locationsTab(){
+    const rows = DatabaseService.get('locations').map(l=>`<tr><td style="font-weight:700;">${l.name}</td><td>${l.code||'-'}</td><td>${statusPill(l)}</td><td>${DatabaseService.get('facilities').filter(f=>f.locationId===l.id).length}</td><td>${actions('locations',l,true)}</td></tr>`).join('');
+    return `<div style="margin-bottom:14px; display:flex; gap:8px; flex-wrap:wrap;"><input id="md_loc_name" placeholder="Nama lokasi baru" style="flex:1; min-width:160px; ${inp}"><input id="md_loc_code" placeholder="Kode" style="width:100px; ${inp}"><button class="btn btn-primary" onclick="MasterDataPage.addLocation()"><i class="fa-solid fa-plus"></i> Tambah</button></div>
+      <div class="sf-table-wrap">${rows?`<table class="sf-table"><thead><tr><th>Name</th><th>Code</th><th>Status</th><th>Fasilitas</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada lokasi.')}</div>`;
+  }
+  function functionsTab(){
+    const rows = DatabaseService.get('functions').map(f=>`<tr><td style="font-weight:700;"><i class="fa-solid ${f.icon||'fa-layer-group'}" style="color:var(--yellow); margin-right:6px;"></i>${f.name}</td><td>${statusPill(f)}</td><td>${DatabaseService.get('facilities').filter(x=>x.functionId===f.id).length}</td><td>${actions('functions',f,true)}</td></tr>`).join('');
+    return `<div style="margin-bottom:14px; display:flex; gap:8px; flex-wrap:wrap;"><input id="md_fn_name" placeholder="Nama function baru" style="flex:1; min-width:160px; ${inp}"><button class="btn btn-primary" onclick="MasterDataPage.addFunction()"><i class="fa-solid fa-plus"></i> Tambah</button></div>
+      <div class="sf-table-wrap">${rows?`<table class="sf-table"><thead><tr><th>Name</th><th>Status</th><th>Fasilitas</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada function.')}</div>`;
+  }
+  function facilitiesTab(){
+    const locs = MasterData.activeList('locations'), funcs = MasterData.activeList('functions');
+    const rows = DatabaseService.get('facilities').map(f=>`<tr><td style="font-weight:700;">${f.name}</td><td>${n('locations',f.locationId)}</td><td>${n('functions',f.functionId)}</td><td>${statusPill(f)}</td><td>${actions('facilities',f,true)}</td></tr>`).join('');
+    return `<div style="margin-bottom:14px; display:flex; gap:8px; flex-wrap:wrap;">
+      <input id="md_fac_name" placeholder="Nama fasilitas baru" style="flex:1; min-width:160px; ${inp}">
+      <select id="md_fac_loc" style="${inp}">${locs.map(l=>`<option value="${l.id}">${l.name}</option>`).join('')}</select>
+      <select id="md_fac_fn" style="${inp}">${funcs.map(fn=>`<option value="${fn.id}">${fn.name}</option>`).join('')}</select>
+      <button class="btn btn-primary" onclick="MasterDataPage.addFacility()"><i class="fa-solid fa-plus"></i> Tambah</button></div>
+      <div class="kpi-foot" style="margin-bottom:10px;">Hanya Location &amp; Function yang ACTIVE yang bisa dipilih untuk fasilitas baru.</div>
+      <div class="sf-table-wrap">${rows?`<table class="sf-table"><thead><tr><th>Name</th><th>Location</th><th>Function</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada fasilitas.')}</div>`;
+  }
+  function peopleTab(){
+    const locs = MasterData.activeList('locations');
+    const rows = DatabaseService.get('responsiblePersons').map(r=>`<tr><td style="font-weight:700;">${r.name}</td><td>${r.employeeId||'-'}</td><td>${r.department||'-'}</td><td>${r.locationId?n('locations',r.locationId):'-'}</td><td>${statusPill(r)}</td>
+      <td><div class="row-actions"><span class="icon-sm" title="Edit" onclick="MasterDataPage.openEditPerson('${r.id}')"><i class="fa-solid fa-pen"></i></span>
+      <span class="icon-sm" title="${MasterData.isActive(r)?'Nonaktifkan':'Aktifkan'}" onclick="MasterDataPage.toggleStatus('responsiblePersons','${r.id}')"><i class="fa-solid ${MasterData.isActive(r)?'fa-toggle-on':'fa-toggle-off'}" style="color:${MasterData.isActive(r)?'var(--green)':'var(--muted-dim)'}"></i></span></div></td></tr>`).join('');
+    return `<div style="margin-bottom:14px; display:flex; gap:8px; flex-wrap:wrap;">
+      <input id="md_rp_name" placeholder="Nama" style="flex:1; min-width:140px; ${inp}"><input id="md_rp_emp" placeholder="Employee ID" style="width:120px; ${inp}"><input id="md_rp_dept" placeholder="Department" style="width:140px; ${inp}">
+      <select id="md_rp_loc" style="${inp}"><option value="">Lokasi (opsional)</option>${locs.map(l=>`<option value="${l.id}">${l.name}</option>`).join('')}</select>
+      <button class="btn btn-primary" onclick="MasterDataPage.addPerson()"><i class="fa-solid fa-plus"></i> Tambah</button></div>
+      <div class="kpi-foot" style="margin-bottom:10px;">Hanya Responsible Person ACTIVE yang muncul di form SF baru. Nilai lama (teks bebas) pada SF yang sudah ada tetap terbaca.</div>
+      <div class="sf-table-wrap">${rows?`<table class="sf-table"><thead><tr><th>Nama</th><th>Employee ID</th><th>Department</th><th>Location</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada Responsible Person.')}</div>`;
+  }
+  function usersTab(){
+    const me = AuthService.currentUser();
+    const rows = DatabaseService.get('users').map(u=>`<tr><td style="font-weight:700;">${u.username}</td><td>${u.name}</td><td>${u.role}</td>
+      <td><div class="row-actions"><span class="icon-sm" title="Edit" onclick="MasterDataPage.openEditUser('${u.id}')"><i class="fa-solid fa-pen"></i></span>
+      ${me && me.id!==u.id ? `<span class="icon-sm" title="Hapus" onclick="MasterDataPage.deleteUser('${u.id}')"><i class="fa-solid fa-trash" style="color:var(--red)"></i></span>`:''}</div></td></tr>`).join('');
+    return `<div style="margin-bottom:14px; display:flex; gap:8px; flex-wrap:wrap;">
+      <input id="md_user_name" placeholder="Nama lengkap" style="flex:1; min-width:140px; ${inp}"><input id="md_user_username" placeholder="Username" style="width:120px; ${inp}"><input id="md_user_password" type="password" placeholder="Password (min. 6)" style="width:150px; ${inp}">
+      <select id="md_user_role" style="${inp}"><option>Admin</option><option>Supervisor</option></select>
+      <button class="btn btn-primary" onclick="MasterDataPage.addUser()"><i class="fa-solid fa-plus"></i> Tambah</button></div>
+      <div class="sf-table-wrap"><table class="sf-table"><thead><tr><th>Username</th><th>Nama</th><th>Role</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+  function configTab(){
+    return `<div class="kpi-foot" style="margin-bottom:12px;">Frequency dan Status adalah nilai sistem yang dipakai langsung oleh Scheduler Engine — bersifat referensi (read-only).</div>
+      <div class="panel-row">
+        <div class="panel"><h3>Frequency</h3>${['Weekly','Monthly','Every 3 Months','Every 6 Months','Yearly'].map(f=>`<div class="func-row"><div class="func-name">${f}</div></div>`).join('')}</div>
+        <div class="panel"><h3>Status</h3>${['NOT_STARTED','DUE_SOON','DUE_TODAY','OVERDUE','COMPLETED','CANCELLED'].map(s=>`<div class="func-row"><div class="func-name">${s.replace('_',' ')}</div></div>`).join('')}</div>
+      </div>`;
+  }
+
+  /* ---- create ---- */
+  function dupName(coll, name, extra){ return DatabaseService.get(coll).some(r=>r.name.toLowerCase()===name.toLowerCase() && (!extra || extra(r))); }
+  function addLocation(){
+    if(!AuthService.guard('CREATE_MASTER_DATA')) return;
+    const name = MasterData.cleanName(document.getElementById('md_loc_name').value, 'Nama lokasi'); if(!name) return;
+    const code = MasterData.cleanName(document.getElementById('md_loc_code').value || '-', 'Kode'); if(!code) return;
+    if(dupName('locations', name)){ UIService.showToast('Lokasi dengan nama tersebut sudah ada.'); return; }
+    const rec = {id:DatabaseService.uid('loc'), name, code:code==='-'?'':code, status:'ACTIVE'};
+    DatabaseService.insert('locations', rec);
+    AuditService.log({action:'CREATE_LOCATION', object:'Location', objectId:rec.id, newValue:name});
+    UIService.showToast('Lokasi berhasil ditambahkan.'); UIService.refresh();
+  }
+  function addFunction(){
+    if(!AuthService.guard('CREATE_MASTER_DATA')) return;
+    const name = MasterData.cleanName(document.getElementById('md_fn_name').value, 'Nama function'); if(!name) return;
+    if(dupName('functions', name)){ UIService.showToast('Function dengan nama tersebut sudah ada.'); return; }
+    const rec = {id:DatabaseService.uid('fn'), name, icon:'fa-layer-group', status:'ACTIVE'};
+    DatabaseService.insert('functions', rec);
+    AuditService.log({action:'CREATE_FUNCTION', object:'Function', objectId:rec.id, newValue:name});
+    UIService.showToast('Function berhasil ditambahkan.'); UIService.refresh();
+  }
+  function addFacility(){
+    if(!AuthService.guard('CREATE_MASTER_DATA')) return;
+    const name = MasterData.cleanName(document.getElementById('md_fac_name').value, 'Nama fasilitas'); if(!name) return;
+    const locationId = document.getElementById('md_fac_loc').value, functionId = document.getElementById('md_fac_fn').value;
+    const loc = DatabaseService.get('locations').find(l=>l.id===locationId), fn = DatabaseService.get('functions').find(f=>f.id===functionId);
+    if(!loc || !fn){ UIService.showToast('Pilih Location dan Function yang aktif.'); return; }
+    if(!MasterData.isActive(loc) || !MasterData.isActive(fn)){ UIService.showToast('Location/Function nonaktif tidak dapat dipakai untuk fasilitas baru.'); return; }
+    if(dupName('facilities', name, r=>r.locationId===locationId && r.functionId===functionId)){ UIService.showToast('Fasilitas dengan nama tersebut sudah ada pada Location & Function ini.'); return; }
+    const rec = {id:DatabaseService.uid('fac'), name, locationId, functionId, status:'ACTIVE'};
+    DatabaseService.insert('facilities', rec);
+    AuditService.log({action:'CREATE_FACILITY', object:'Facility', objectId:rec.id, newValue:name});
+    UIService.showToast('Fasilitas berhasil ditambahkan.'); UIService.refresh();
+  }
+  function addPerson(){
+    if(!AuthService.guard('CREATE_MASTER_DATA')) return;
+    const name = MasterData.cleanName(document.getElementById('md_rp_name').value, 'Nama'); if(!name) return;
+    const emp = (document.getElementById('md_rp_emp').value||'').trim(), dept = (document.getElementById('md_rp_dept').value||'').trim();
+    if(/[<>"]/.test(emp+dept)){ UIService.showToast('Employee ID/Department tidak boleh mengandung karakter < > atau ".'); return; }
+    if(dupName('responsiblePersons', name)){ UIService.showToast('Responsible Person dengan nama tersebut sudah ada.'); return; }
+    if(emp && DatabaseService.get('responsiblePersons').some(r=>(r.employeeId||'').toLowerCase()===emp.toLowerCase())){ UIService.showToast('Employee ID sudah digunakan.'); return; }
+    const locationId = document.getElementById('md_rp_loc').value;
+    const rec = {id:DatabaseService.uid('rp'), name, employeeId:emp, department:dept, locationId, status:'ACTIVE'};
+    DatabaseService.insert('responsiblePersons', rec);
+    AuditService.log({action:'CREATE_RESPONSIBLE_PERSON', object:'ResponsiblePerson', objectId:rec.id, newValue:name});
+    UIService.showToast('Responsible Person berhasil ditambahkan.'); UIService.refresh();
+  }
+  function addUser(){
+    if(!AuthService.guard('CREATE_USER')) return;
+    const name = MasterData.cleanName(document.getElementById('md_user_name').value, 'Nama lengkap'); if(!name) return;
+    const username = MasterData.cleanName(document.getElementById('md_user_username').value, 'Username'); if(!username) return;
+    const password = document.getElementById('md_user_password').value;
+    const role = document.getElementById('md_user_role').value;
+    if(!password || password.length<6){ UIService.showToast('Password minimal 6 karakter.'); return; }
+    if(['Admin','Supervisor'].indexOf(role)<0){ UIService.showToast('Role tidak valid.'); return; }
+    if(DatabaseService.get('users').some(u=>u.username.toLowerCase()===username.toLowerCase())){ UIService.showToast('Username sudah digunakan.'); return; }
+    const initials = name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const rec = {id:DatabaseService.uid('u'), username, password, name, role, initials};
+    DatabaseService.insert('users', rec);
+    AuditService.log({action:'CREATE_USER', object:'User', objectId:rec.id, newValue:username, remarks:'Role: '+role}); // password is never logged
+    UIService.showToast('User berhasil ditambahkan.'); UIService.refresh();
+  }
+
+  /* ---- status / delete ---- */
+  function toggleStatus(coll, id){
+    if(!AuthService.guard('DEACTIVATE_MASTER_DATA')) return;
+    const rec = DatabaseService.get(coll).find(r=>r.id===id); if(!rec) return;
+    const old = MasterData.isActive(rec) ? 'ACTIVE' : 'INACTIVE';
+    const next = old==='ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    DatabaseService.update(coll, id, {status:next});
+    AuditService.log({action: next==='INACTIVE' ? 'DEACTIVATE_MASTER_DATA' : 'ACTIVATE_MASTER_DATA', object:MasterData.LABEL[coll]||coll, objectId:id, oldValue:old, newValue:next, remarks:rec.name});
+    UIService.showToast(rec.name+' sekarang '+next+'. Data historis tidak berubah.'); UIService.refresh();
+  }
+  function deleteEntity(coll, id){
+    if(!AuthService.guard('DELETE_MASTER_DATA')) return;
+    if(['locations','functions','facilities'].indexOf(coll)<0){ UIService.showToast('Jenis data ini tidak dapat dihapus.'); return; }
+    const rec = DatabaseService.get(coll).find(r=>r.id===id); if(!rec) return;
+    const ref = MasterData.referenceCount(coll, id);
+    if(ref.total>0){
+      const labels = {standardForms:'Standard Forms', schedules:'Schedules', submissions:'Submissions', documents:'Documents', auditLogs:'Audit Logs', facilities:'Facilities'};
+      const lines = Object.keys(ref.counts).filter(k=>ref.counts[k]>0).map(k=>`<div class="func-row"><div class="func-name">${labels[k]}</div><div class="func-count">${ref.counts[k]}</div></div>`).join('');
+      document.getElementById('sfModalBox').innerHTML = `
+        <div class="modal-head"><h3>Tidak dapat dihapus</h3><button class="modal-close" onclick="SFPage.closeModal()"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="modal-body">
+          <p style="margin-bottom:12px;">This item cannot be deleted because it is currently used by existing records.<br><span style="color:var(--muted);">Item ini tidak dapat dihapus karena sedang dipakai oleh data yang ada.</span></p>
+          <div style="font-weight:700; margin-bottom:6px;">${rec.name} &middot; ${ref.total} record terkait</div>${lines}
+        </div>
+        <div class="modal-foot"><button class="btn btn-ghost" onclick="SFPage.closeModal()">Tutup</button>
+          ${MasterData.isActive(rec)?`<button class="btn btn-primary" onclick="SFPage.closeModal(); MasterDataPage.toggleStatus('${coll}','${id}')"><i class="fa-solid fa-toggle-off"></i> Nonaktifkan</button>`:''}</div>`;
+      document.getElementById('sfModalScrim').classList.add('open');
+      return;
+    }
+    if(!confirm('Hapus "'+rec.name+'"? Tidak ada data yang memakainya.')) return;
+    DatabaseService.remove(coll, id);
+    AuditService.log({action:'DELETE_MASTER_DATA', object:MasterData.LABEL[coll]||coll, objectId:id, oldValue:rec.name, newValue:null});
+    UIService.showToast('Data dihapus.'); UIService.refresh();
+  }
+
+  /* ---- edit person / user ---- */
+  function openEditPerson(id){
+    if(!AuthService.guard('EDIT_MASTER_DATA')) return;
+    const r = DatabaseService.get('responsiblePersons').find(x=>x.id===id); if(!r) return;
+    const used = MasterData.referenceCount('responsiblePersons', id).counts.standardForms;
+    const locs = MasterData.activeList('locations', r.locationId);
+    document.getElementById('sfModalBox').innerHTML = `
+      <div class="modal-head"><h3>Edit Responsible Person</h3><button class="modal-close" onclick="SFPage.closeModal()"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="modal-body"><div class="form-grid">
+        <div class="full"><label>Nama ${used?'(terkunci: dipakai '+used+' SF)':''}</label><input id="ep_name" value="${r.name}" ${used?'disabled':''}></div>
+        <div><label>Employee ID</label><input id="ep_emp" value="${r.employeeId||''}"></div>
+        <div><label>Department</label><input id="ep_dept" value="${r.department||''}"></div>
+        <div class="full"><label>Location</label><select id="ep_loc"><option value="">-</option>${locs.map(l=>`<option value="${l.id}" ${l.id===r.locationId?'selected':''}>${l.name}</option>`).join('')}</select></div>
+      </div></div>
+      <div class="modal-foot"><button class="btn btn-ghost" onclick="SFPage.closeModal()">Batal</button><button class="btn btn-primary" onclick="MasterDataPage.saveEditPerson('${id}')">Simpan</button></div>`;
+    document.getElementById('sfModalScrim').classList.add('open');
+  }
+  function saveEditPerson(id){
+    if(!AuthService.guard('EDIT_MASTER_DATA')) return;
+    const r = DatabaseService.get('responsiblePersons').find(x=>x.id===id); if(!r) return;
+    const used = MasterData.referenceCount('responsiblePersons', id).counts.standardForms;
+    const name = used ? r.name : MasterData.cleanName(document.getElementById('ep_name').value, 'Nama'); if(!name) return;
+    const emp = (document.getElementById('ep_emp').value||'').trim(), dept = (document.getElementById('ep_dept').value||'').trim();
+    if(/[<>"]/.test(emp+dept)){ UIService.showToast('Karakter < > " tidak diperbolehkan.'); return; }
+    if(name.toLowerCase()!==r.name.toLowerCase() && dupName('responsiblePersons', name)){ UIService.showToast('Nama sudah digunakan.'); return; }
+    if(emp && DatabaseService.get('responsiblePersons').some(x=>x.id!==id && (x.employeeId||'').toLowerCase()===emp.toLowerCase())){ UIService.showToast('Employee ID sudah digunakan.'); return; }
+    DatabaseService.update('responsiblePersons', id, {name, employeeId:emp, department:dept, locationId:document.getElementById('ep_loc').value});
+    AuditService.log({action:'EDIT_MASTER_DATA', object:'ResponsiblePerson', objectId:id, oldValue:r.name+' / '+(r.employeeId||'-'), newValue:name+' / '+(emp||'-')});
+    SFPage.closeModal(); UIService.showToast('Responsible Person diperbarui.'); UIService.refresh();
+  }
+  function adminCount(excludeId){ return DatabaseService.get('users').filter(u=>u.role==='Admin' && u.id!==excludeId).length; }
+  function openEditUser(id){
+    if(!AuthService.guard('EDIT_USER')) return;
+    const u = DatabaseService.get('users').find(x=>x.id===id); if(!u) return;
+    document.getElementById('sfModalBox').innerHTML = `
+      <div class="modal-head"><h3>Edit User — ${u.username}</h3><button class="modal-close" onclick="SFPage.closeModal()"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="modal-body"><div class="form-grid">
+        <div class="full"><label>Nama lengkap</label><input id="eu_name" value="${u.name}"></div>
+        <div><label>Role</label><select id="eu_role"><option ${u.role==='Admin'?'selected':''}>Admin</option><option ${u.role==='Supervisor'?'selected':''}>Supervisor</option></select></div>
+        <div><label>Password baru (opsional)</label><input id="eu_pass" type="password" placeholder="kosongkan jika tidak diubah"></div>
+      </div></div>
+      <div class="modal-foot"><button class="btn btn-ghost" onclick="SFPage.closeModal()">Batal</button><button class="btn btn-primary" onclick="MasterDataPage.saveEditUser('${id}')">Simpan</button></div>`;
+    document.getElementById('sfModalScrim').classList.add('open');
+  }
+  function saveEditUser(id){
+    if(!AuthService.guard('EDIT_USER')) return;
+    const u = DatabaseService.get('users').find(x=>x.id===id); if(!u) return;
+    const name = MasterData.cleanName(document.getElementById('eu_name').value, 'Nama lengkap'); if(!name) return;
+    const role = document.getElementById('eu_role').value, pass = document.getElementById('eu_pass').value;
+    if(['Admin','Supervisor'].indexOf(role)<0){ UIService.showToast('Role tidak valid.'); return; }
+    if(u.role==='Admin' && role!=='Admin' && adminCount(id)===0){ UIService.showToast('Tidak dapat mengubah role: ini satu-satunya Admin.'); return; }
+    if(pass && pass.length<6){ UIService.showToast('Password minimal 6 karakter.'); return; }
+    const patch = {name, role, initials:name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase()};
+    if(pass) patch.password = pass;
+    DatabaseService.update('users', id, patch);
+    AuditService.log({action:'EDIT_USER', object:'User', objectId:id, oldValue:u.name+' / '+u.role, newValue:name+' / '+role, remarks: pass?'Password diubah (nilai tidak dicatat)':''});
+    SFPage.closeModal(); UIService.showToast('User diperbarui.'); UIService.refresh();
+  }
+  function deleteUser(id){
+    if(!AuthService.guard('DELETE_USER')) return;
+    const me = AuthService.currentUser(), u = DatabaseService.get('users').find(x=>x.id===id); if(!u) return;
+    if(me && me.id===id){ UIService.showToast('Anda tidak dapat menghapus akun yang sedang dipakai.'); return; }
+    if(u.role==='Admin' && adminCount(id)===0){ UIService.showToast('Tidak dapat menghapus satu-satunya Admin.'); return; }
+    if(!confirm('Hapus user "'+u.username+'"?')) return;
+    DatabaseService.remove('users', id);
+    AuditService.log({action:'DELETE_USER', object:'User', objectId:id, oldValue:u.username, newValue:null});
+    UIService.showToast('User dihapus.'); UIService.refresh();
+  }
+
+  function render(){
+    if(!AuthService.can('VIEW_MASTER_DATA')) return UIService.deniedHTML('Master Data');
+    const tabs = [['locations','Locations'],['functions','Functions'],['facilities','Facilities'],['users','Users'],['people','Responsible Persons'],['config','Frequency & Status']];
+    const body = { locations:locationsTab, functions:functionsTab, facilities:facilitiesTab, users:usersTab, people:peopleTab, config:configTab }[tab]();
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Master Data</span></div>
+      <div class="page-head"><div><div class="page-title">Master Data</div><div class="page-sub">Kelola data referensi. Data yang sudah dipakai tidak bisa dihapus — nonaktifkan saja.</div></div></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">${tabs.map(([k,l])=>`<button class="btn ${tab===k?'btn-primary':'btn-ghost'}" style="font-size:12px;" onclick="MasterDataPage.setTab('${k}')">${l}</button>`).join('')}</div>
+      ${body}`;
+  }
+  return { render, setTab, addLocation, addFunction, addFacility, addPerson, addUser, toggleStatus, deleteEntity, openEditPerson, saveEditPerson, openEditUser, saveEditUser, deleteUser };
+})();
+
+/* ============ SettingsPage ============ */
+const SettingsPage = (function(){
+  function render(){
+    if(!AuthService.can('MANAGE_SETTINGS')) return UIService.deniedHTML('Settings');
+    const s = SettingsService.getAll();
+    const notifRows = Object.keys(s.notifTypesEnabled).map(t=>`
+      <div class="func-row"><div class="func-name">${t.replace(/_/g,' ')}</div>
+        <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--muted);">
+          <input type="checkbox" ${s.notifTypesEnabled[t]?'checked':''} onchange="SettingsPage.toggleNotif('${t}', this.checked)"> Aktif
+        </label></div>`).join('');
+    const today = todayISO();
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Settings</span></div>
+      <div class="page-head"><div><div class="page-title">Settings</div><div class="page-sub">Preferensi aplikasi (disimpan per browser)</div></div></div>
+      <div class="panel-row">
+        <div class="panel">
+          <h3><i class="fa-solid fa-sliders" style="color:var(--yellow)"></i> Preferensi Umum</h3>
+          <div class="form-grid">
+            <div><label>Due Soon Warning Period (hari)</label><input type="number" min="1" max="60" value="${ScheduleService.getConfig().dueSoonWarningDays}" onchange="SettingsPage.setWarning(this.value)"></div>
+            <div><label>Date Format <span style="color:var(--muted-dim);">(contoh: ${SettingsService.formatDate(today)})</span></label><select onchange="SettingsPage.setSetting('dateFormat', this.value)">
+              <option value="iso" ${s.dateFormat==='iso'?'selected':''}>YYYY-MM-DD</option><option value="dmy" ${s.dateFormat==='dmy'?'selected':''}>DD/MM/YYYY</option><option value="mdy" ${s.dateFormat==='mdy'?'selected':''}>MM/DD/YYYY</option></select></div>
+            <div><label>Default Dashboard</label><select onchange="SettingsPage.setSetting('defaultDashboard', this.value)">
+              ${[['dashboard','Dashboard'],['standardforms','Standard Forms'],['overdue','Overdue Command'],['annual','Annual Activity'],['reports','Reports']].map(([v,l])=>`<option value="${v}" ${s.defaultDashboard===v?'selected':''}>${l}</option>`).join('')}
+            </select></div>
+            <div><label>Theme</label><select onchange="SettingsPage.setSetting('theme', this.value)"><option value="dark" ${s.theme==='dark'?'selected':''}>Dark (Industrial)</option><option value="light" ${s.theme==='light'?'selected':''}>Light</option></select></div>
+          </div>
+        </div>
+        <div class="panel"><h3><i class="fa-solid fa-bell" style="color:var(--yellow)"></i> Notification Preferences</h3>${notifRows}</div>
+      </div>`;
+  }
+  function setSetting(key, val){
+    if(!AuthService.guard('MANAGE_SETTINGS')) return;
+    if(key==='dateFormat' && ['iso','dmy','mdy'].indexOf(val)<0) return;
+    SettingsService.set(key, val); UIService.showToast('Pengaturan disimpan.'); UIService.refresh();
+  }
+  function toggleNotif(type, enabled){
+    if(!AuthService.guard('MANAGE_SETTINGS')) return;
+    SettingsService.setNotifType(type, enabled); UIService.showToast('Preferensi notifikasi diperbarui.'); UIService.refresh();
+  }
+  function setWarning(val){
+    if(!AuthService.guard('MANAGE_SETTINGS')) return;
+    SettingsService.setWarningDays(val); ScheduleService.runScheduler(); UIService.showToast('Periode peringatan diperbarui.'); UIService.refresh();
+  }
+  return { render, setSetting, toggleNotif, setWarning };
+})();
+
+/* ============ Bootstrapping ============ */
+let pendingUploadSfId = null; // which SF a 'completed document' upload via hiddenFileInput targets
+function fillDemo(type){
+  document.getElementById('loginUser').value = type;
+  document.getElementById('loginPass').value = type==='admin' ? 'admin123' : 'supervisor123';
+}
+
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const user = AuthService.login(u,p);
+  const errEl = document.getElementById('loginError');
+  if(user){
+    errEl.style.display='none';
+    enterApp();
+  } else {
+    errEl.style.display='block';
+  }
+});
+
+function enterApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  UIService.boot();
+}
+
+(function init(){
+  try{ SettingsService.applyTheme(SettingsService.get('theme')); }catch(e){ console.error('Theme init error:', e); }
+  try{
+    seedDemoData();
+    migrateStandardForms();
+    migrateSchedules();
+    MasterData.migrateStatus();
+    MasterData.migrateResponsiblePersons();
+    ScheduleService.runScheduler();
+  }catch(e){ console.error('Seeding/migration error:', e); }
+  const existing = AuthService.currentUser();
+  if(existing){ enterApp(); }
+  document.getElementById('sfModalScrim').addEventListener('click', function(e){ if(e.target===this) SFPage.closeModal(); });
+})();
+</script>
+</body>
+</html>
