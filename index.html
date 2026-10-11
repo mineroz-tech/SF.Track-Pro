@@ -210,6 +210,28 @@ table.sf-table{width:100%; border-collapse:collapse; min-width:920px;}
 .row-actions{display:flex; gap:6px;}
 .icon-sm{width:28px; height:28px; border-radius:6px; background:var(--navy-700); border:1px solid var(--border); display:inline-flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px;}
 .icon-sm:hover{color:var(--white); background:var(--navy-600);}
+.sf-table.has-actions th:last-child, .sf-table.has-actions td:last-child{position:sticky; right:0; z-index:1; background:var(--navy-800); box-shadow:-8px 0 8px -8px rgba(0,0,0,.45);}
+.sf-table.has-actions th:last-child{z-index:2;}
+.sf-table td.wrap{white-space:normal; min-width:150px;}
+.help-sec{background:var(--navy-800); border:1px solid var(--border); border-radius:10px; margin-bottom:10px;}
+.help-sec summary{padding:14px 18px; font-weight:700; font-size:14px; cursor:pointer; list-style:none; display:flex; align-items:center; gap:10px;}
+.help-sec summary::-webkit-details-marker{display:none;}
+.help-sec summary::after{content:'+'; margin-left:auto; color:var(--muted); font-size:18px; font-weight:400;}
+.help-sec[open] summary::after{content:'\2212';}
+.help-sec[open] summary{border-bottom:1px solid var(--border-soft);}
+.help-body{padding:14px 20px 18px; line-height:1.65; color:var(--muted); font-size:13px;}
+.help-body strong{color:var(--white);}
+.help-body ol, .help-body ul{margin:8px 0 8px 20px;}
+.help-body li{margin-bottom:5px;}
+.help-body h4{color:var(--white); font-size:13px; margin:14px 0 4px;}
+.help-body table{border-collapse:collapse; margin:8px 0; width:100%;}
+.help-body th, .help-body td{border:1px solid var(--border); padding:7px 10px; text-align:left; font-size:12.5px;}
+.help-body th{color:var(--white); background:var(--navy-700);}
+.help-tag{display:inline-block; font-size:10px; font-weight:800; padding:2px 7px; border-radius:20px; margin-right:4px; vertical-align:middle; background:var(--navy-600); color:var(--white);}
+.help-tag.admin{background:color-mix(in srgb, var(--yellow) 22%, transparent); color:var(--yellow);}
+.help-tag.sup{background:color-mix(in srgb, var(--blue) 22%, transparent); color:var(--blue);}
+.help-note{border-left:3px solid var(--yellow); background:var(--navy-700); padding:10px 14px; border-radius:6px; margin:10px 0; color:var(--white);}
+.help-dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px;}
 .empty-state{padding:50px 20px; text-align:center; color:var(--muted);}
 .empty-state i, .empty-state svg{font-size:30px; color:var(--muted-dim); margin-bottom:10px;}
 
@@ -325,6 +347,7 @@ table.sf-table{width:100%; border-collapse:collapse; min-width:920px;}
         <a class="nav-item" data-page="reports" onclick="UIService.navigate('reports')"><i class="fa-solid fa-chart-column nav-ic"></i> Reports</a>
 
         <div class="nav-section-label">Sistem</div>
+        <a class="nav-item" data-page="help" onclick="UIService.navigate('help')"><i class="fa-solid fa-circle-question nav-ic"></i> Petunjuk</a>
         <a class="nav-item" data-page="masterdata" onclick="UIService.navigate('masterdata')"><i class="fa-solid fa-database nav-ic"></i> Master Data</a>
         <a class="nav-item" data-page="settings" onclick="UIService.navigate('settings')"><i class="fa-solid fa-gear nav-ic"></i> Settings</a>
       </div>
@@ -1240,6 +1263,7 @@ const UIService = (function(){
     if(page==='reports'){ el.innerHTML = ReportsPage.render(); return; }
     if(page==='masterdata'){ el.innerHTML = MasterDataPage.render(); return; }
     if(page==='settings'){ el.innerHTML = SettingsPage.render(); return; }
+    if(page==='help'){ el.innerHTML = HelpPage.render(); return; }
     const labels = {};
     el.innerHTML = `
       <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">${labels[page]||page}</span></div>
@@ -1380,9 +1404,9 @@ const SFPage = (function(){
     const rows = forms.map(f=>`
       <tr>
         <td style="font-weight:700; color:var(--yellow);">${f.sfNumber}</td>
-        <td>${f.sfTitle}</td>
+        <td class="wrap">${f.sfTitle}</td>
         <td>${refName('locations', f.locationId)}</td>
-        <td>${refName('functions', f.functionId)}</td>
+        <td class="wrap">${refName('functions', f.functionId)}</td>
         <td>${refName('facilities', f.facilityId)}</td>
         <td>${f.frequency}</td>
         <td>${f.responsiblePerson||'-'}</td>
@@ -1416,7 +1440,7 @@ const SFPage = (function(){
         </select>
       </div>
       <div class="sf-table-wrap">
-        ${forms.length ? `<table class="sf-table"><thead><tr>
+        ${forms.length ? `<table class="sf-table has-actions"><thead><tr>
           <th onclick="SFPage.setFilter('sortBy','sfNumber')">SF Number</th>
           <th onclick="SFPage.setFilter('sortBy','sfTitle')">Title</th>
           <th>Location</th><th>Function</th><th>Facility</th>
@@ -1624,7 +1648,7 @@ const OverduePage = (function(){
         </div>
       </div>
       <div class="sf-table-wrap">
-        ${list.length ? `<table class="sf-table"><thead><tr>
+        ${list.length ? `<table class="sf-table has-actions"><thead><tr>
           <th>SF</th><th>Location</th><th>Function</th><th>Facility</th><th>Due Date</th><th>Days Overdue</th><th>Responsible Person</th><th>Action</th>
         </tr></thead><tbody>${rows}</tbody></table>`
         : `<div class="empty-state"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i><div>Tidak ada Standard Form yang overdue. Semua terkendali.</div></div>`}
@@ -2161,7 +2185,7 @@ const JadwalPage = (function(){
         <label style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted);"><input type="checkbox" ${f.openOnly?'checked':''} onchange="JadwalPage.setF('openOnly', this.checked)"> Hanya yang belum selesai</label>
       </div>
       <div class="sf-table-wrap">
-        ${list.length ? `<table class="sf-table"><thead><tr><th>Scheduled</th><th>Due Date</th><th>Location</th><th>Function</th><th>Facility</th><th>SF</th><th>Frequency</th><th>Responsible</th><th>Status</th><th>Completed</th><th></th></tr></thead><tbody>${rows}</tbody></table>`
+        ${list.length ? `<table class="sf-table has-actions"><thead><tr><th>Scheduled</th><th>Due Date</th><th>Location</th><th>Function</th><th>Facility</th><th>SF</th><th>Frequency</th><th>Responsible</th><th>Status</th><th>Completed</th><th></th></tr></thead><tbody>${rows}</tbody></table>`
         : `<div class="empty-state"><i class="fa-solid fa-calendar-xmark"></i><div>Tidak ada jadwal yang cocok dengan filter.</div></div>`}
       </div>`;
   }
@@ -2222,11 +2246,185 @@ const DokumenPage = (function(){
         <select onchange="DokumenPage.setF('status', this.value)"><option value="all">Semua Status</option><option value="PENDING" ${f.status==='PENDING'?'selected':''}>Pending Review</option><option value="APPROVED" ${f.status==='APPROVED'?'selected':''}>Approved</option><option value="CANCELLED" ${f.status==='CANCELLED'?'selected':''}>Cancelled</option></select>
       </div>
       <div class="sf-table-wrap">
-        ${list.length ? `<table class="sf-table"><thead><tr><th>Tipe</th><th>File</th><th>Standard Form</th><th>Location</th><th>Function</th><th>Facility</th><th>Diunggah Oleh</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`
+        ${list.length ? `<table class="sf-table has-actions"><thead><tr><th>Tipe</th><th>File</th><th>Standard Form</th><th>Location</th><th>Function</th><th>Facility</th><th>Diunggah Oleh</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`
         : `<div class="empty-state"><i class="fa-solid fa-folder-open"></i><div>Belum ada dokumen yang cocok dengan filter.</div></div>`}
       </div>`;
   }
   return { render, setF, download };
+})();
+
+
+/* ============ HelpPage (Petunjuk Penggunaan) ============ */
+const HelpPage = (function(){
+  const A = '<span class="help-tag admin">Admin</span>', S = '<span class="help-tag sup">Supervisor</span>';
+  // capability -> permission key. The matrix below is generated from AuthService.PERMISSIONS, so it can never drift from the real rules.
+  const CAPS = [
+    ['Melihat Standard Form, jadwal, dokumen, dashboard','VIEW_SF'], ['Melihat notifikasi','VIEW_NOTIFICATIONS'], ['Melihat Reports & export CSV','VIEW_REPORTS'],
+    ['Membuat SF','CREATE_SF'], ['Mengubah SF','EDIT_SF'], ['Menghapus SF','DELETE_SF'], ['Menduplikasi SF','DUPLICATE_SF'],
+    ['Upload template SF','UPLOAD_TEMPLATE'], ['Upload dokumen terisi','UPLOAD_COMPLETED_FILE'], ['Menyelesaikan siklus langsung (tanpa review)','COMPLETE_SF'],
+    ['Approve submission','APPROVE'], ['Reject / Cancel submission','REJECT'],
+    ['Membuka Master Data','VIEW_MASTER_DATA'], ['Menambah Master Data','CREATE_MASTER_DATA'], ['Menonaktifkan / mengaktifkan Master Data','DEACTIVATE_MASTER_DATA'], ['Menghapus Master Data (yang tidak dipakai)','DELETE_MASTER_DATA'],
+    ['Mengelola user','CREATE_USER'], ['Membuka Audit Trail','VIEW_AUDIT_TRAIL'], ['Mengubah Settings','MANAGE_SETTINGS']
+  ];
+  function matrix(){
+    const P = AuthService.PERMISSIONS, me = AuthService.currentUser();
+    const cell = (role, key) => (P[role]||[]).indexOf(key) > -1 ? '<span style="color:var(--green); font-weight:800;">&#10003;</span>' : '<span style="color:var(--muted-dim);">&mdash;</span>';
+    const hl = role => (me && me.role===role) ? ' style="background:color-mix(in srgb, var(--yellow) 12%, transparent);"' : '';
+    return `<table><thead><tr><th>Kemampuan</th><th${hl('Admin')}>Admin</th><th${hl('Supervisor')}>Supervisor</th></tr></thead><tbody>${
+      CAPS.map(([label,key])=>`<tr><td>${label}</td><td${hl('Admin')}>${cell('Admin',key)}</td><td${hl('Supervisor')}>${cell('Supervisor',key)}</td></tr>`).join('')}</tbody></table>`;
+  }
+  function section(title, icon, body, open){
+    return `<details class="help-sec" ${open?'open':''}><summary><i class="fa-solid ${icon}" style="color:var(--yellow); width:18px;"></i>${title}</summary><div class="help-body">${body}</div></details>`;
+  }
+  function render(){
+    const me = AuthService.currentUser();
+    const roleNote = me ? `Anda masuk sebagai <strong>${me.name}</strong> (<strong>${me.role}</strong>). Kolom peran Anda disorot pada tabel hak akses.` : '';
+    const sections = [
+      section('Mulai Cepat','fa-rocket',`
+        <p>${roleNote}</p>
+        <ol>
+          <li><strong>Masuk</strong> dengan username &amp; password Anda. Di layar login ada tombol <em>Demo Accounts</em> untuk mengisi akun contoh.</li>
+          <li><strong>Pilih lokasi</strong> di kiri atas (<em>Semua Lokasi</em>, Main Location, Branch 01&ndash;03). Pilihan ini menyaring Dashboard, Standard Forms, Jadwal, Dokumen, dan Overdue Command.</li>
+          <li><strong>Dashboard</strong> menampilkan ringkasan KPI, grafik, dan heatmap. Mulai dari sana untuk melihat apa yang perlu ditindak.</li>
+          <li>Gunakan menu di kiri. Tombol <strong>&#9776;</strong> di topbar menyembunyikan/menampilkan menu (pilihan diingat), dan tombol <strong>bulan/matahari</strong> mengganti tema gelap/terang.</li>
+        </ol>
+        <div class="help-note">Data aplikasi ini disimpan <strong>di browser perangkat ini</strong> (LocalStorage). Membuka dari browser/perangkat lain, atau menghapus data situs, berarti data tidak ikut. Belum ada sinkronisasi antar pengguna.</div>`, true),
+
+      section('Alur Kerja Utama: dari SF sampai Siklus Berikutnya','fa-diagram-project',`
+        <ol>
+          <li>${A} <strong>Buat Standard Form</strong> (menu Standard Forms &rarr; <em>Tambah Standard Form</em>) dan pilih frequency. Jadwal pertama dibuat otomatis.</li>
+          <li>Saat jatuh tempo mendekat, status berubah otomatis: <em>Not Started</em> &rarr; <em>Due Soon</em> &rarr; <em>Due Today</em> &rarr; <em>Overdue</em>.</li>
+          <li>${A} Setelah form dikerjakan, buka detail SF (ikon mata) dan <strong>Upload New Completed Document</strong>. Dokumen berstatus <em>Pending Review</em>.</li>
+          <li>${S} Buka detail SF yang sama, lalu <strong>Approve</strong> atau <strong>Reject / Cancel</strong>.
+            <ul><li><strong>Approve</strong>: siklus ditandai selesai dan <strong>siklus berikutnya dibuat otomatis</strong> (berlanjut tanpa batas).</li>
+            <li><strong>Reject / Cancel</strong>: wajib mengisi <em>alasan pembatalan</em>. Dokumen menjadi <em>Cancelled</em>, siklus tetap terbuka, dan Admin dapat upload ulang.</li></ul></li>
+          <li>Setiap langkah tercatat di <strong>Audit Trail</strong>.</li>
+        </ol>
+        <div class="help-note">Setiap SF hanya punya <strong>satu siklus terbuka</strong> pada satu waktu. Siklus berikutnya baru muncul setelah siklus sekarang disetujui. Karena itu jadwal tidak bertambah sendiri bila siklus lama belum selesai.</div>`),
+
+      section('Standard Forms','fa-file-signature',`
+        <ul>
+          <li><strong>Cari / filter / urut</strong>: kolom pencarian (nomor, judul, PIC), filter Fungsi &amp; Status, klik judul kolom untuk mengurutkan.</li>
+          <li><strong>Ikon aksi</strong> (kolom Aksi selalu terlihat di kanan): &#128065; detail &bull; &#9998; ubah &bull; &#10003; selesaikan siklus langsung &bull; duplikat &bull; unduh template &bull; hapus. Ikon yang tidak diizinkan untuk peran Anda tidak ditampilkan.</li>
+          <li>${A} <strong>Form tambah/ubah</strong>: pilih Location &rarr; Function &rarr; Facility (hanya data <em>aktif</em>), isi judul, pilih <strong>Responsible Person</strong> dari daftar, pilih frequency, lalu unggah template (.xlsx, .xls, .docx, .doc, maks. 4 MB).</li>
+          <li>Nomor SF dibuat otomatis bila dikosongkan. Karakter &lt; dan &gt; tidak diperbolehkan pada judul/nomor/deskripsi.</li>
+          <li>Memberi status <em>Cancelled</em> pada SF mengeluarkannya dari penjadwalan, notifikasi, dan perhitungan KPI.</li>
+          <li>${A} Tombol &#10003; (<em>Complete Current Cycle</em>) menyelesaikan siklus <strong>tanpa dokumen dan tanpa review Supervisor</strong>. Pakai hanya untuk koreksi administratif.</li>
+          <li>Hapus SF ikut menghapus jadwal dan dokumennya, dan tidak dapat dibatalkan.</li>
+        </ul>`),
+
+      section('Frequency dan Aturan Tanggal','fa-calendar-check',`
+        <table><thead><tr><th>Frequency</th><th>Jatuh tempo berikutnya</th></tr></thead><tbody>
+          <tr><td>Weekly</td><td>+7 hari</td></tr><tr><td>Monthly</td><td>+1 bulan</td></tr><tr><td>Every 3 Months</td><td>+3 bulan</td></tr><tr><td>Every 6 Months</td><td>+6 bulan</td></tr><tr><td>Yearly</td><td>+12 bulan</td></tr></tbody></table>
+        <ul><li>Siklus dihitung dari <strong>tanggal jatuh tempo sebelumnya</strong> (bukan dari tanggal selesai), jadi ritme tetap teratur walau selesai lebih awal/telat.</li>
+        <li>Untuk tanggal 29&ndash;31, hasil dipangkas ke akhir bulan (31 Jan &rarr; 28/29 Feb) lalu kembali ke tanggal 31 di bulan yang memilikinya.</li>
+        <li><strong>Due Soon</strong> berarti jatuh tempo dalam batas peringatan (default 3 hari; Admin dapat mengubahnya di Settings atau Overdue Command).</li></ul>`),
+
+      section('Arti Status dan Warna','fa-palette',`
+        <table><thead><tr><th>Status</th><th>Arti</th><th>Warna (Dashboard &amp; daftar SF)</th></tr></thead><tbody>
+          <tr><td>Not Started</td><td>Jatuh tempo masih jauh</td><td><span class="help-dot" style="background:var(--muted-dim)"></span>Abu-abu</td></tr>
+          <tr><td>Due Soon</td><td>Jatuh tempo dalam batas peringatan</td><td><span class="help-dot" style="background:var(--blue)"></span>Biru</td></tr>
+          <tr><td>Due Today</td><td>Jatuh tempo hari ini</td><td><span class="help-dot" style="background:var(--yellow)"></span>Kuning</td></tr>
+          <tr><td>Overdue</td><td>Lewat jatuh tempo &amp; belum selesai</td><td><span class="help-dot" style="background:var(--red)"></span>Merah</td></tr>
+          <tr><td>Completed</td><td>Siklus selesai (disetujui)</td><td><span class="help-dot" style="background:var(--green)"></span>Hijau</td></tr>
+          <tr><td>Cancelled</td><td>SF dibatalkan / dokumen ditolak</td><td><span class="help-dot" style="background:var(--orange)"></span>Oranye</td></tr></tbody></table>
+        <div class="help-note">Perhatian: halaman <strong>Annual Activity</strong> dan <strong>Jadwal</strong> memakai skema warna sendiri: <em>Due Today = oranye</em> dan <em>Due Soon = kuning</em>. Legenda tersedia di halaman tersebut.</div>`),
+
+      section('Dashboard','fa-gauge-high',`
+        <ul>
+          <li><strong>Total Active SF</strong>: SF tidak dibatalkan. <strong>Overdue / Due Today / Due Soon</strong>: jumlah siklus terbuka pada status itu.</li>
+          <li><strong>Completed</strong>: siklus yang sudah selesai dan jatuh tempo pada tahun berjalan.</li>
+          <li><strong>Compliance %</strong>: dari semua siklus yang sudah jatuh tempo, berapa persen yang selesai.</li>
+          <li><strong>Missing Document</strong>: SF aktif tanpa template.</li>
+          <li><strong>Audit Readiness %</strong>: rata-rata 5 komponen (kelengkapan dokumen, kepatuhan jadwal, paparan overdue, kelengkapan submission, kelengkapan audit trail). Ini <strong>metrik deskriptif</strong>, bukan penilaian kinerja personel.</li>
+          <li><strong>Heatmap</strong>: compliance per Lokasi &times; Fungsi. Hijau &ge; 95%, kuning 90&ndash;94%, oranye 80&ndash;89%, merah &lt; 80%.</li>
+          <li>Grafik tren bulanan baru terisi bila ada riwayat siklus selesai selama beberapa bulan.</li>
+        </ul>`),
+
+      section('Jadwal, Overdue Command, dan Annual Activity','fa-calendar-days',`
+        <h4>Jadwal</h4><p>Daftar semua siklus (scheduled, due, status, tanggal selesai). Saring berdasarkan status atau &ldquo;hanya yang belum selesai&rdquo;. Tidak ada tombol selesai di sini; penyelesaian lewat upload &amp; approval.</p>
+        <h4>Overdue Command</h4><p>Siklus yang melewati jatuh tempo, urut dari yang terlama, dengan jumlah hari terlambat. ${A} dapat langsung <em>Complete</em>; ${S} memakai <em>Buka SF</em> untuk meninjau.</p>
+        <h4>Annual Activity</h4>
+        <ul><li>Pilih <strong>tahun</strong> (termasuk tahun-tahun mendatang) dan filter Lokasi, Fungsi, Fasilitas, Frequency, Status, PIC.</li>
+        <li>Tiga tampilan: <strong>Calendar</strong> (bulanan), <strong>Yearly Table</strong>, dan <strong>Gantt</strong>.</li>
+        <li>Tahun mendatang <strong>diproyeksikan</strong> dari frekuensi tiap SF. Proyeksi tidak disimpan, jadi tidak membuat jadwal ganda; ia menjadi nyata satu per satu saat siklus sebelumnya selesai.</li>
+        <li>Ringkasan: Total Planned, Completed, Pending, Overdue, Compliance %. <strong>Export CSV</strong> mengunduh data sesuai filter.</li></ul>`),
+
+      section('Dokumen dan Detail SF','fa-folder-open',`
+        <ul>
+          <li><strong>Detail SF</strong> (ikon &#128065;): informasi SF, <em>Original Template</em> (unduh), <em>Latest Completed Document</em> (lihat/unduh), dan tabel riwayat (tanggal, user, aksi, file, status, catatan).</li>
+          <li>Format yang diterima: <strong>XLSX, XLS, DOCX, DOC, PDF, JPG, JPEG, PNG</strong>, maksimal <strong>4 MB</strong>. File ditolak dengan pesan jelas bila tipe/ukuran tidak sesuai.</li>
+          <li>Pratinjau &ldquo;View&rdquo; tersedia untuk PDF dan gambar; file Word/Excel hanya bisa diunduh.</li>
+          <li>Menu <strong>Dokumen</strong> adalah pustaka semua template dan dokumen terisi dengan pencarian &amp; filter. Upload dan review tetap dilakukan di detail SF.</li>
+          <li>Template berlabel <em>(demo)</em> adalah contoh bawaan tanpa isi file, sehingga tidak bisa diunduh.</li>
+        </ul>`),
+
+      section('Notifikasi dan Pencarian','fa-bell',`
+        <ul>
+          <li><strong>Lonceng</strong>: Due Today, Due Soon, Overdue, Missing Document, New Submission, Supervisor Review Required, Cancelled Submission. Klik satu notifikasi untuk menandai dibaca, atau <em>Mark All Read</em>.</li>
+          <li>Notifikasi dibuat dari kondisi data saat ini, jadi akan hilang sendiri bila kondisinya sudah teratasi.</li>
+          <li>${A} Jenis notifikasi dapat dimatikan di Settings. Pesan WhatsApp/email belum aktif; hanya antarmuka persiapannya yang ada.</li>
+          <li><strong>Pencarian global</strong> (kotak di topbar) mencari nomor SF, judul, lokasi, fungsi, fasilitas, PIC, dan status. Beberapa kata boleh dalam urutan bebas, misalnya <em>kna 05 ozzy</em>. Klik hasil untuk membuka SF.</li>
+        </ul>`),
+
+      section('Reports dan Export','fa-chart-column',`
+        <ul>
+          <li>Halaman <strong>Reports</strong> berisi <em>Management Summary</em> dan tujuh laporan: SF Compliance, Overdue, Annual Activity (tahun berjalan), Document Submission, ${A} Audit Trail, Location Performance, dan Function Performance.</li>
+          <li>Setiap laporan dapat diekspor ke <strong>CSV</strong>. Tanggal di CSV memakai format ISO (YYYY-MM-DD) agar mudah diolah; berkas memakai UTF-8 sehingga karakter Indonesia terbaca di Excel.</li>
+          <li>Export <strong>Excel (XLSX)</strong> dan <strong>PDF</strong> <strong>belum tersedia</strong>. Tombolnya hanya penanda untuk rilis mendatang.</li>
+        </ul>`),
+
+      section('Master Data','fa-database',`
+        <p>${A} Menu <strong>Master Data</strong> memuat Locations, Functions, Facilities, Users, Responsible Persons, serta Frequency &amp; Status (hanya rujukan).</p>
+        <ul>
+          <li><strong>Aturan hapus aman</strong>: data yang sudah dipakai SF, jadwal, dokumen, atau audit <strong>tidak dapat dihapus</strong>. Aplikasi menampilkan jumlah record terkait dan menawarkan <strong>Nonaktifkan</strong>.</li>
+          <li>Data <strong>nonaktif</strong> tetap tampil pada riwayat, tetapi tidak muncul untuk SF/fasilitas baru. Aktifkan lagi kapan saja dengan ikon sakelar.</li>
+          <li><strong>Responsible Person</strong> memiliki Employee ID, Department, dan Location. Hanya yang aktif muncul pada form SF baru; nilai teks lama pada SF yang sudah ada tetap terbaca.</li>
+          <li><strong>Users</strong>: tambah, ubah (nama, peran, password), hapus. Sistem menolak menghapus akun yang sedang dipakai atau satu-satunya Admin. Password tidak pernah dicatat di Audit Trail.</li>
+        </ul>`),
+
+      section('Settings dan Audit Trail','fa-gear',`
+        <h4>Settings ${A}</h4>
+        <ul><li><strong>Due Soon Warning Period</strong> (hari), <strong>Date Format</strong> (YYYY-MM-DD, DD/MM/YYYY, MM/DD/YYYY; hanya tampilan, data tersimpan tetap ISO), <strong>Default Dashboard</strong> (halaman pertama setelah login), <strong>Theme</strong>, dan <strong>Notification Preferences</strong>.</li>
+        <li>Tema juga bisa diganti semua peran lewat tombol di topbar.</li></ul>
+        <h4>Audit Trail ${A}</h4>
+        <p>Mencatat waktu, user, peran, aksi, objek, ID objek, nilai lama/baru, dan catatan untuk login/logout, perubahan SF, upload/unduh file, approve/reject/cancel, perubahan master data &amp; user, dan perubahan pengaturan. Percobaan tanpa izin juga tercatat sebagai <em>PERMISSION_DENIED</em>.</p>`),
+
+      section('Hak Akses Peran','fa-user-shield',`
+        <p>Tabel ini dibuat langsung dari aturan izin aplikasi.</p>${matrix()}
+        <p>Aturan ini diperiksa saat aksi dijalankan, bukan hanya dengan menyembunyikan tombol.</p>`),
+
+      section('Tanya Jawab dan Pemecahan Masalah','fa-life-ring',`
+        <h4>Tombol/menu tertentu tidak muncul.</h4><p>Itu bergantung pada peran. Lihat tabel <em>Hak Akses Peran</em>. Supervisor tidak melihat Master Data, Settings, dan Audit Trail.</p>
+        <h4>Master data tidak bisa dihapus.</h4><p>Karena masih dipakai data lain. Gunakan <em>Nonaktifkan</em>.</p>
+        <h4>Tidak bisa menyetujui dokumen.</h4><p>Hanya Supervisor yang dapat Approve/Reject, dan hanya untuk dokumen berstatus Pending Review. Dokumen yang sudah direview tidak dapat direview ulang.</p>
+        <h4>Upload ditolak.</h4><p>Periksa format (daftar di bagian Dokumen) dan ukuran maksimal 4 MB.</p>
+        <h4>Jadwal berikutnya belum muncul.</h4><p>Siklus berikutnya dibuat setelah siklus saat ini <strong>disetujui</strong>. Lihat tahun mendatang di Annual Activity untuk proyeksinya.</p>
+        <h4>Data hilang / berbeda di perangkat lain.</h4><p>Data tersimpan per browser. Hindari menghapus &ldquo;data situs&rdquo; dan jangan gunakan mode penyamaran untuk pekerjaan nyata.</p>
+        <h4>Grafik kosong.</h4><p>Pastikan koneksi internet aktif (pustaka grafik dimuat dari internet) dan data riwayat sudah ada. Heatmap tetap tampil tanpa pustaka tersebut.</p>
+        <div class="help-note"><strong>Batasan versi prototipe:</strong> data hanya di browser, login demo bukan keamanan produksi, ukuran file 4 MB, belum ada Excel/PDF/WhatsApp/email. Untuk penggunaan produksi diperlukan backend dan autentikasi sungguhan.</div>`)
+    ];
+    return `
+      <div class="breadcrumb"><span>SF.Track Pro</span><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i><span class="active">Petunjuk</span></div>
+      <div class="page-head"><div><div class="page-title">Petunjuk Penggunaan</div><div class="page-sub">Panduan singkat SF.Track Pro &middot; tag ${A} ${S} menunjukkan peran yang menjalankan langkah tersebut</div></div></div>
+      <div class="toolbar"><div class="tb-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="helpSearch" placeholder="Cari di petunjuk... (mis. approve, overdue, export)" oninput="HelpPage.filter(this.value)"></div></div>
+      <div id="helpSections">${sections.join('')}</div>
+      <div id="helpEmpty" class="empty-state" style="display:none;"><i class="fa-solid fa-circle-question"></i><div>Tidak ada bagian petunjuk yang cocok.</div></div>`;
+  }
+  function filter(q){
+    const words = String(q||'').toLowerCase().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    document.querySelectorAll('#helpSections .help-sec').forEach(d=>{
+      const text = d.textContent.toLowerCase();
+      const hit = words.every(w=>text.indexOf(w)>-1);
+      d.style.display = hit ? '' : 'none';
+      if(words.length && hit) d.setAttribute('open','');
+      if(!words.length) d.removeAttribute('open');
+      if(hit) shown++;
+    });
+    const empty = document.getElementById('helpEmpty'); if(empty) empty.style.display = shown ? 'none' : '';
+  }
+  return { render, filter };
 })();
 
 /* ============ SettingsService ============ */
@@ -2523,12 +2721,12 @@ const MasterDataPage = (function(){
   function locationsTab(){
     const rows = DatabaseService.get('locations').map(l=>`<tr><td style="font-weight:700;">${l.name}</td><td>${l.code||'-'}</td><td>${statusPill(l)}</td><td>${DatabaseService.get('facilities').filter(f=>f.locationId===l.id).length}</td><td>${actions('locations',l,true)}</td></tr>`).join('');
     return `<div style="margin-bottom:14px; display:flex; gap:8px; flex-wrap:wrap;"><input id="md_loc_name" placeholder="Nama lokasi baru" style="flex:1; min-width:160px; ${inp}"><input id="md_loc_code" placeholder="Kode" style="width:100px; ${inp}"><button class="btn btn-primary" onclick="MasterDataPage.addLocation()"><i class="fa-solid fa-plus"></i> Tambah</button></div>
-      <div class="sf-table-wrap">${rows?`<table class="sf-table"><thead><tr><th>Name</th><th>Code</th><th>Status</th><th>Fasilitas</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada lokasi.')}</div>`;
+      <div class="sf-table-wrap">${rows?`<table class="sf-table has-actions"><thead><tr><th>Name</th><th>Code</th><th>Status</th><th>Fasilitas</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada lokasi.')}</div>`;
   }
   function functionsTab(){
     const rows = DatabaseService.get('functions').map(f=>`<tr><td style="font-weight:700;"><i class="fa-solid ${f.icon||'fa-layer-group'}" style="color:var(--yellow); margin-right:6px;"></i>${f.name}</td><td>${statusPill(f)}</td><td>${DatabaseService.get('facilities').filter(x=>x.functionId===f.id).length}</td><td>${actions('functions',f,true)}</td></tr>`).join('');
     return `<div style="margin-bottom:14px; display:flex; gap:8px; flex-wrap:wrap;"><input id="md_fn_name" placeholder="Nama function baru" style="flex:1; min-width:160px; ${inp}"><button class="btn btn-primary" onclick="MasterDataPage.addFunction()"><i class="fa-solid fa-plus"></i> Tambah</button></div>
-      <div class="sf-table-wrap">${rows?`<table class="sf-table"><thead><tr><th>Name</th><th>Status</th><th>Fasilitas</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada function.')}</div>`;
+      <div class="sf-table-wrap">${rows?`<table class="sf-table has-actions"><thead><tr><th>Name</th><th>Status</th><th>Fasilitas</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada function.')}</div>`;
   }
   function facilitiesTab(){
     const locs = MasterData.activeList('locations'), funcs = MasterData.activeList('functions');
@@ -2539,7 +2737,7 @@ const MasterDataPage = (function(){
       <select id="md_fac_fn" style="${inp}">${funcs.map(fn=>`<option value="${fn.id}">${fn.name}</option>`).join('')}</select>
       <button class="btn btn-primary" onclick="MasterDataPage.addFacility()"><i class="fa-solid fa-plus"></i> Tambah</button></div>
       <div class="kpi-foot" style="margin-bottom:10px;">Hanya Location &amp; Function yang ACTIVE yang bisa dipilih untuk fasilitas baru.</div>
-      <div class="sf-table-wrap">${rows?`<table class="sf-table"><thead><tr><th>Name</th><th>Location</th><th>Function</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada fasilitas.')}</div>`;
+      <div class="sf-table-wrap">${rows?`<table class="sf-table has-actions"><thead><tr><th>Name</th><th>Location</th><th>Function</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada fasilitas.')}</div>`;
   }
   function peopleTab(){
     const locs = MasterData.activeList('locations');
@@ -2551,7 +2749,7 @@ const MasterDataPage = (function(){
       <select id="md_rp_loc" style="${inp}"><option value="">Lokasi (opsional)</option>${locs.map(l=>`<option value="${l.id}">${l.name}</option>`).join('')}</select>
       <button class="btn btn-primary" onclick="MasterDataPage.addPerson()"><i class="fa-solid fa-plus"></i> Tambah</button></div>
       <div class="kpi-foot" style="margin-bottom:10px;">Hanya Responsible Person ACTIVE yang muncul di form SF baru. Nilai lama (teks bebas) pada SF yang sudah ada tetap terbaca.</div>
-      <div class="sf-table-wrap">${rows?`<table class="sf-table"><thead><tr><th>Nama</th><th>Employee ID</th><th>Department</th><th>Location</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada Responsible Person.')}</div>`;
+      <div class="sf-table-wrap">${rows?`<table class="sf-table has-actions"><thead><tr><th>Nama</th><th>Employee ID</th><th>Department</th><th>Location</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table>`:empty('Belum ada Responsible Person.')}</div>`;
   }
   function usersTab(){
     const me = AuthService.currentUser();
@@ -2562,7 +2760,7 @@ const MasterDataPage = (function(){
       <input id="md_user_name" placeholder="Nama lengkap" style="flex:1; min-width:140px; ${inp}"><input id="md_user_username" placeholder="Username" style="width:120px; ${inp}"><input id="md_user_password" type="password" placeholder="Password (min. 6)" style="width:150px; ${inp}">
       <select id="md_user_role" style="${inp}"><option>Admin</option><option>Supervisor</option></select>
       <button class="btn btn-primary" onclick="MasterDataPage.addUser()"><i class="fa-solid fa-plus"></i> Tambah</button></div>
-      <div class="sf-table-wrap"><table class="sf-table"><thead><tr><th>Username</th><th>Nama</th><th>Role</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      <div class="sf-table-wrap"><table class="sf-table has-actions"><thead><tr><th>Username</th><th>Nama</th><th>Role</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
   function configTab(){
     return `<div class="kpi-foot" style="margin-bottom:12px;">Frequency dan Status adalah nilai sistem yang dipakai langsung oleh Scheduler Engine — bersifat referensi (read-only).</div>
